@@ -206,6 +206,7 @@
                                 <span>Admin</span>
                                 <a class="d-flex align-items-center text-muted" href="#" aria-label="Add a new report">
                                     <span data-feather="plus-circle"></span>
+                                    <i class="bi bi-gear-fill"></i>
                                 </a>
                             </h6>
                             <ul class="nav flex-column mb-2">
