@@ -148,7 +148,7 @@
                                     class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1">
                                     <span>Personal</span>
                                     <a class="d-flex align-items-center text-muted" href="#" aria-label="Add a new report">
-                                        <span data-feather="plus-circle"></span>
+                                        <i class="bi bi-person-circle"></i>
                                     </a>
                                 </h6>
                                 <li class="nav-item">
@@ -160,14 +160,14 @@
                                 <li class="nav-item">
                                     <a class="nav-link" href="#">
                                         <span data-feather="file"></span>
-                                        Settings
+                                        Settings  
                                     </a>
                                 </li>
                                 <h6
                                     class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1">
                                     <span>Project Scope</span>
                                     <a class="d-flex align-items-center text-muted" href="#" aria-label="Add a new report">
-                                        <span data-feather="plus-circle"></span>
+                                        <i class="bi bi-lightning-charge-fill"></i>
                                     </a>
                                 </h6>
                                 <li class="nav-item">
@@ -205,7 +205,6 @@
                             <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1">
                                 <span>Admin</span>
                                 <a class="d-flex align-items-center text-muted" href="#" aria-label="Add a new report">
-                                    <span data-feather="plus-circle"></span>
                                     <i class="bi bi-gear-fill"></i>
                                 </a>
                             </h6>
