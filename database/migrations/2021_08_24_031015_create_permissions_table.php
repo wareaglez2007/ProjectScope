@@ -13,9 +13,22 @@ class CreatePermissionsTable extends Migration
      */
     public function up()
     {
+
+        /**
+         * Permissions table
+         * Needs:
+         * 1. ID
+         * 2. access_type
+         * 3. access_rights
+         * 4. created_date
+         * 5. updated_date
+         * 6. created_by (user id)
+         **/
         Schema::create('permissions', function (Blueprint $table) {
             $table->id();
-            $table->string('permission_type')->nullable();
+            $table->string('access_type')->uniqid();
+            $table->string('access_rights')->unique();
+            $table->string('created_by')->default('PermissionsSeeder');
             $table->timestamps();
         });
     }

@@ -108,6 +108,9 @@ h6 {
     .sidebar {
         top: 56px;
     }
+    .only-desktop{
+        display: none !important;
+    }
 }
 
 @media (max-width: 767.98px) {
@@ -185,4 +188,11 @@ h6 {
 
 #contnet-container {
     max-width: 1500px !important;
+}
+
+/*
+* If a link in collapse menu is active, ensure it has the correct color
+*/
+#collapseFive a.active{
+    color: #ffffff !important;
 }

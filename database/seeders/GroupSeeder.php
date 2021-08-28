@@ -1,6 +1,7 @@
 <?php
 
 namespace Database\Seeders;
+
 use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Seeder;
 
@@ -18,6 +19,8 @@ class GroupSeeder extends Seeder
         8 => 'Design'
 
     ];
+
+  
     /**
      * Run the database seeds.
      *

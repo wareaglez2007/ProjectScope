@@ -30,5 +30,33 @@ Auth::routes();
  * 
  * 
  */
+Route::get('dashboard', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+Route::middleware('auth')->prefix('admin')->group(function () {
+   
+    Route::get('profile', [App\Http\Controllers\ProfileController::class, 'index'])->name('admin.profile');
+    Route::get('profile/create', [App\Http\Controllers\ProfileController::class, 'create'])->name('admin.profile.create');
 
-Route::get('/dashboard', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+    Route::get('groups',[App\Http\Controllers\GroupsController::class, 'index'])->name('admin.groups');
+    Route::get('groups/create',[App\Http\Controllers\GroupsController::class, 'create'])->name('admin.groups.create');
+    Route::get('groups/update/{id}',[App\Http\Controllers\GroupsController::class, 'update'])->name('admin.groups.update');
+    Route::get('groups/show/{id}',[App\Http\Controllers\GroupsController::class, 'show'])->name('admin.groups.show');
+
+    Route::get('modules',[App\Http\Controllers\ModulesController::class, 'index'])->name('admin.modules');
+    Route::get('modules/create',[App\Http\Controllers\ModulesController::class, 'create'])->name('admin.modules.create');
+    Route::get('modules/update',[App\Http\Controllers\ModulesController::class, 'update'])->name('admin.modules.update');
+
+    Route::get('roles',[App\Http\Controllers\RolesController::class, 'index'])->name('admin.roles');
+    Route::get('roles/create',[App\Http\Controllers\RolesController::class, 'create'])->name('admin.roles.create');
+    Route::get('roles/update',[App\Http\Controllers\RolesController::class, 'update'])->name('admin.roles.update');
+    Route::get('roles/show/{id}',[App\Http\Controllers\RolesController::class, 'show'])->name('admin.roles.show');
+
+    Route::get('permissions',[App\Http\Controllers\PermissionsController::class, 'index'])->name('admin.permissions');
+    Route::get('permissions/create',[App\Http\Controllers\PermissionsController::class, 'create'])->name('admin.permissions.create');
+    Route::get('permissions/update',[App\Http\Controllers\PermissionsController::class, 'update'])->name('admin.permissions.update');
+
+    
+});
+
+Route::middleware('auth')->prefix('users')->group(function () {
+    Route::get('profile', [App\Http\Controllers\ProfileController::class, 'index'])->name('user.profile');
+});

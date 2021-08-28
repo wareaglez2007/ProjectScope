@@ -12,7 +12,7 @@
 
     <!-- Scripts -->
     <script src="{{ asset('js/app.js') }}" defer></script>
-
+    <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.3/jquery-ui.min.js" defer></script>
     <!-- Fonts -->
     <link rel="dns-prefetch" href="//fonts.gstatic.com">
     <link href="https://fonts.googleapis.com/css?family=Nunito" rel="stylesheet">
@@ -152,7 +152,18 @@
                                     </a>
                                 </h6>
                                 <li class="nav-item">
-                                    <a class="nav-link active" href="#">
+                                    @if (Auth::user()->id == 1)
+                                        @php
+                                            $url = 'admin.profile';
+                                            
+                                        @endphp
+                                    @else
+                                        @php
+                                            $url = 'user.profile';
+                                            
+                                        @endphp
+                                    @endif
+                                    <a class="nav-link active" href="{{ route($url) }}">
                                         <span data-feather="home"></span>
                                         Profile <span class="sr-only">(current)</span>
                                     </a>
@@ -160,7 +171,7 @@
                                 <li class="nav-item">
                                     <a class="nav-link" href="#">
                                         <span data-feather="file"></span>
-                                        Settings  
+                                        Settings
                                     </a>
                                 </li>
                                 <h6
@@ -201,39 +212,86 @@
                                     </a>
                                 </li>
                             </ul>
+                            @if (Auth::user()->id == 1)
 
-                            <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1">
-                                <span>Admin</span>
-                                <a class="d-flex align-items-center text-muted" href="#" aria-label="Add a new report">
-                                    <i class="bi bi-gear-fill"></i>
-                                </a>
-                            </h6>
-                            <ul class="nav flex-column mb-2">
-                                <li class="nav-item">
-                                    <a class="nav-link" href="#">
-                                        <span data-feather="file-text"></span>
-                                        User Management
+                                <h6
+                                    class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1">
+                                    <span>Admin</span>
+                                    <a class="d-flex align-items-center text-muted" href="#" aria-label="Add a new report">
+                                        <i class="bi bi-gear-fill"></i>
                                     </a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link" href="#">
-                                        <span data-feather="file-text"></span>
-                                        DashBoard Management
-                                    </a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link" href="#">
-                                        <span data-feather="file-text"></span>
-                                        Account Management
-                                    </a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link" href="#">
-                                        <span data-feather="file-text"></span>
-                                        3rd Party API Management
-                                    </a>
-                                </li>
-                            </ul>
+                                </h6>
+                                <ul class="nav flex-column mb-2">
+                                    {{-- Add Colapseable --}}
+                                    @php
+                                        $active1 = '';
+                                        $active2 = '';
+                                        $active3 = '';
+                                        $active4 = '';
+                                        
+                                        if (Request::segment(1) == 'admin') {
+                                            if (Request::segment(2) == 'groups') {
+                                                $active1 = 'active';
+                                            } elseif (Request::segment(2) == 'roles') {
+                                                $active2 = 'active';
+                                            } elseif (Request::segment(2) == 'permissions') {
+                                                $active3 = 'active';
+                                            } elseif (Request::segment(2) == 'modules') {
+                                                $active4 = 'active';
+                                            }
+                                        }
+                                        
+                                    @endphp
+
+                                    <li class="nav-item">
+                                        <div class="accordion" id="accordionFive">
+                                            <a class="nav-link" data-toggle="collapse" data-target="#collapseFive"
+                                                aria-expanded="false" aria-controls="collapseFive" href="#">
+                                                &nbsp;Site Settings
+                                            </a>
+                                            <div class="collapse hide" id="collapseFive" class=""
+                                                aria-labelledby="headingFive" data-parent="#accordionFive">
+                                                <a href="{{ route('admin.groups') }}"
+                                                    class="list-group-item nav-link {{ $active1 }}"><i
+                                                        class="bi bi-diagram-3"></i>&nbsp;Groups</a>
+                                                <a href="{{ route('admin.roles') }}"
+                                                    class="list-group-item nav-link {{ $active2 }}"><i
+                                                        class="bi bi-people"></i>&nbsp;
+                                                    Roles</a>
+                                                <a href="{{ route('admin.permissions') }}"
+                                                    class="list-group-item nav-link {{ $active3 }}"><i
+                                                        class="bi bi-stoplights"></i>&nbsp;
+                                                    Permission</a>
+                                                <a href="{{ route('admin.modules') }}"
+                                                    class="list-group-item nav-link {{ $active4 }}"><i
+                                                        class="bi bi-hdd-stack"></i>&nbsp;
+                                                    Module Access</a>
+
+                                            </div>
+                                        </div>
+                                    </li>
+
+
+                                    <li class="nav-item">
+                                        <a class="nav-link" href="#">
+                                            <span data-feather="file-text"></span>
+                                            DashBoard Management
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link" href="#">
+                                            <span data-feather="file-text"></span>
+                                            Account Management
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link" href="#">
+                                            <span data-feather="file-text"></span>
+                                            3rd Party API Management
+                                        </a>
+                                    </li>
+                                </ul>
+                            @endif
                         </div>
                     </nav>
                 @endauth
@@ -250,6 +308,8 @@
         </div>
 
     </div>
+
+    <script src="{{ asset('js/collapsemenuopen.js') }}" defer></script>
 </body>
 
 </html>
