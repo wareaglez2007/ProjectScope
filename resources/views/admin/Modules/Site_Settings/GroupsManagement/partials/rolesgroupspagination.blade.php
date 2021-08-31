@@ -66,15 +66,22 @@
                         @endphp
                         <tr>
                             <td>
-                                <div class="form-check">
-                                    <input type="checkbox" class="form-check-input checkboxes" name="roles"
-                                        id="role_{{ $role->id }}" value="{{ $role->id }}" {{ $checked }} onchange="UpdateGroupsRoles({{ $role->id }}, {{ $id }})">
-                                </div>
+                                <label class="switch">
+
+                                    <input type="checkbox" data-toggle="toggle" data-on="Yes" name="roles" data-off="No"
+                                        id="role_{{ $role->id }}" value="{{ $role->id }}" {{ $checked }}
+                                        onchange="UpdateGroupsRoles({{ $role->id }}, {{ $id }})">
+
+                                    <span class="slider round"></span>
+                                </label>
                             </td>
                             <td scope="row">{{ $role->id }}</td>
                             <td>{{ $role->name }}</td>
 
                         </tr>
+
+
+
                     @endforeach
                 </tbody>
             </table>

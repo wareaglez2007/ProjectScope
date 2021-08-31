@@ -21,14 +21,14 @@ Auth::routes();
 
 /**
  * Group the routes
- * 
+ *
  * /admin/
- * 
+ *
  * /user/
- * 
+ *
  * /superuser/
- * 
- * 
+ *
+ *
  */
 Route::get('dashboard', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
 Route::middleware('auth')->prefix('admin')->group(function () {
@@ -47,6 +47,7 @@ Route::middleware('auth')->prefix('admin')->group(function () {
     Route::get('groups/update', [App\Http\Controllers\GroupsController::class, 'update'])->name('admin.groups.update');
     Route::get('groups/show/{id}', [App\Http\Controllers\GroupsController::class, 'show'])->name('admin.groups.show');
     Route::get('groups/groupspagination', [App\Http\Controllers\GroupsController::class, 'GroupsAjaxPaginationdata']);
+    Route::post('groups/search', [App\Http\Controllers\GroupsController::class, 'search']);
     //groupsrolespagination
     Route::get('groups/show/{id}/groupsrolespagination', [App\Http\Controllers\GroupsController::class, 'GroupsRolesAjaxPaginationdata']);
     /**

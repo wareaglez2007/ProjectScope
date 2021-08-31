@@ -1,11 +1,13 @@
 <div id="groups-section">
+
+
     @if (is_countable($groups) && count($groups) > 0)
-        <table class="table table-striped table-inverse table-hover">
+        <table class="table table-inverse table-hover">
             <thead class="thead-inverse">
                 <tr>
                     <th>Group Id</th>
                     <th>Group Name</th>
-                    <th>Created On</th>
+                    <th>Updated On</th>
                     <th>Actions</th>
                 </tr>
             </thead>
@@ -17,8 +19,10 @@
                         <td><a href="{{ route('admin.groups.show', ['id' => $group->id]) }}" class="text-muted">
                                 {{ $group->name }}</a>
                         </td>
-                        <td><a href="{{ route('admin.groups.show', ['id' => $group->id]) }}"
-                                class="text-muted">{{ $group->created_at }}</a></td>
+                        <td>
+                            <a href="{{ route('admin.groups.show', ['id' => $group->id]) }}"
+                                class="text-muted">{{ $group->updated_at }}</a>
+                        </td>
                         <td>
                             <div class="dropdown open">
                                 <button class="btn btn-secondary btn-sm dropdown-toggle" type="button" id="triggerId"
@@ -27,8 +31,12 @@
                                 </button>
                                 <div class="dropdown-menu" aria-labelledby="triggerId">
                                     <a class="dropdown-item"
-                                        href="{{ route('admin.groups.show', ['id' => $group->id]) }}">Edit</a>
-                                    <a class="dropdown-item disabled" href="{{ route('admin.groups') }}">Delete</a>
+                                        href="{{ route('admin.groups.show', ['id' => $group->id]) }}"><i
+                                            class="bi bi-pencil"></i>&nbsp;Edit</a>
+                                    <a class="dropdown-item" href="{{ route('admin.groups') }}"><i
+                                            class="bi bi-lightbulb-off"></i>&nbsp;Deactivate</a>
+                                    <a class="dropdown-item" href="{{ route('admin.groups') }}"><i
+                                            class="bi bi-trash"></i>&nbsp;Delete</a>
                                 </div>
                             </div>
                         </td>

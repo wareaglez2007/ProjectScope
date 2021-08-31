@@ -50,11 +50,11 @@
 //     });
 // });
 
-function UpdateGroupsRoles(role_id,group_id) {
-   // var role_id = new Array();
-   // $("#roles_for_groups input[type=checkbox]:checked").each(function () {
-   //     role_id.push(this.value);
-  //  });
+function UpdateGroupsRoles(role_id, group_id) {
+    // var role_id = new Array();
+    // $("#roles_for_groups input[type=checkbox]:checked").each(function () {
+    //     role_id.push(this.value);
+    //  });
 
     console.log(role_id);
     //Submit form
@@ -76,14 +76,24 @@ function UpdateGroupsRoles(role_id,group_id) {
             group_id: group_id
         },
         success: function (data) {
-           // console.log(data.response.success);
+            var toastcolor = "";
+            var toast_message = "";
             if (typeof data != 'undefined') {
                 var page = $("#groups_roles_show_pagination .pagination a").attr('href').split('page=')[1];
                 //console.log(page);
-                fetch_data(page+1);
-                //$('#group_roles_data').html(data.view);
-                $('#ajax_messsage_updates').attr('class' , 'text-success');
-                $('#ajax_messsage_updates').text(data.response.success);
+                fetch_data(page + 1);
+                // //$('#group_roles_data').html(data.view);
+                // $('#ajax_messsage_updates').attr('class' , 'text-success');
+                // $('#ajax_messsage_updates').text(data.response.success);
+                if (typeof data.response.error != 'undefined') {
+                    toastcolor = "#dc3545";
+                    toast_message = data.response.error;
+                } else {
+                    toastcolor = "#04AA6D";
+                    toast_message = data.response.success;
+                }
+
+                HandleAjaxResponsesToast(850, toastcolor, role_id, toast_message, 200);
             }
         }, //end of success
         error: function (error) {
@@ -156,3 +166,47 @@ $(function () {
     }
 
 });
+
+
+function groupsearch(){
+   var search_q = $("#search_groups").val();
+   $.ajaxSetup({
+    headers: {
+        'X-CSRF-TOKEN': $(
+            'meta[name="csrf-token"]')
+            .attr(
+                'content')
+    }
+
+}); //End of ajax setup
+$.ajax({
+    url: '/admin/groups/search',
+    method: "post",
+    //cache: false,
+    data: {
+        search_q: search_q,
+
+    },
+    success: function (data) {
+        var toastcolor = "";
+        var toast_message = "";
+        if (typeof data != 'undefined') {
+            //var page = $("#groups_roles_show_pagination .pagination a").attr('href').split('page=')[1];
+            //console.log(page);
+            //fetch_data(page + 1);
+           // $('#search_results').fadeIn();
+           // $('#search_results').html(data);
+           //$('#groups-section').html(data.view);
+           $('#groups_data').html(data);
+        }
+    }, //end of success
+    error: function (error) {
+        console.log(error);
+        if (typeof error.responseJSON.message != 'undefined') {
+
+
+        }
+
+    } //end of error
+}); //end of ajax
+}

@@ -13,6 +13,7 @@
     <!-- Scripts -->
     <script src="{{ asset('js/app.js') }}" defer></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.3/jquery-ui.min.js" defer></script>
+    <script src="{{ asset('js/dashboard.js') }}" defer></script>
     @yield('head')
     <!-- Fonts -->
     <link rel="dns-prefetch" href="//fonts.gstatic.com">
@@ -21,10 +22,16 @@
     <!-- Styles -->
     <link href="{{ asset('css/app.css') }}" rel="stylesheet">
     <link href="{{ asset('css/dashboard.css') }}" rel="stylesheet">
+    @yield('styles')
 </head>
 
 <body>
+    <!-- Flexbox container for aligning the toasts -->
+    <div aria-live="polite" aria-atomic="true" class="d-flex justify-content-center align-items-center position-sticky"
+        style="position: relative; top:100px; z-index:9999;" id="dashboard_toast">
+    </div>
     <div id="app">
+
         {{-- First Nav Bar d-none d-lg-block --}}
         <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark d-none d-lg-block" id="navbar-top-sticky">
             <div class="collapse navbar-collapse" id="navbarCollapse">
@@ -85,7 +92,8 @@
                                     {{ __('Logout') }}
                                 </a>
 
-                                <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
+                                <form id="logout-form" action="{{ route('logout') }}" method="POST"
+                                    class="d-none">
                                     @csrf
                                 </form>
                             </div>
@@ -128,7 +136,8 @@
                                     {{ __('Logout') }}
                                 </a>
 
-                                <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
+                                <form id="logout-form" action="{{ route('logout') }}" method="POST"
+                                    class="d-none">
                                     @csrf
                                 </form>
                             </div>
@@ -137,7 +146,6 @@
                 </ul>
             </div>
         </nav>
-
         {{-- Navigation Ends --}}
         <div class="container-fluid">
             <div class="row">
@@ -156,12 +164,12 @@
                                     @if (Auth::user()->id == 1)
                                         @php
                                             $url = 'admin.profile';
-                                            
+
                                         @endphp
                                     @else
                                         @php
                                             $url = 'user.profile';
-                                            
+
                                         @endphp
                                     @endif
                                     <a class="nav-link active" href="{{ route($url) }}">
@@ -229,7 +237,7 @@
                                         $active2 = '';
                                         $active3 = '';
                                         $active4 = '';
-                                        
+
                                         if (Request::segment(1) == 'admin') {
                                             if (Request::segment(2) == 'groups') {
                                                 $active1 = 'active';
@@ -241,7 +249,7 @@
                                                 $active4 = 'active';
                                             }
                                         }
-                                        
+
                                     @endphp
 
                                     <li class="nav-item">
@@ -250,7 +258,7 @@
                                                 aria-expanded="false" aria-controls="collapseFive" href="#">
                                                 &nbsp;Site Settings
                                             </a>
-                                            <div class="collapse hide" id="collapseFive" class=""
+                                            <div class="collapse hide" id="collapseFive" class="___class_+?70___"
                                                 aria-labelledby="headingFive" data-parent="#accordionFive">
                                                 <a href="{{ route('admin.groups') }}"
                                                     class="list-group-item nav-link {{ $active1 }}"><i
@@ -311,7 +319,7 @@
     </div>
 
     <script src="{{ asset('js/collapsemenuopen.js') }}" defer></script>
-    
+
 </body>
 
 </html>

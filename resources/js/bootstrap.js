@@ -11,6 +11,9 @@ try {
     window.$ = window.jQuery = require('jquery');
 
     require('bootstrap');
+    //RS added below on 08-31-2021
+    //From: https://dev.to/dendihandian/adding-select2-to-laravel-the-laravel-mix-way-4285
+    require('select2');
 } catch (e) {}
 
 /**

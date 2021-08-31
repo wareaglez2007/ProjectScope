@@ -1,0 +1,12 @@
+/**
+Drop down menu width
+**/
+
+#search_results .dropdown-menu {
+    width: 100% !important;
+}
+@media (max-width: 992px) {
+    #search_groups_div {
+        margin-top: 15px !important;
+    }
+}

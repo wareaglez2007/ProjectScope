@@ -2,6 +2,9 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 
 @endsection
+@section('styles')
+    <link href="{{ asset('css/groups.css') }}" rel="stylesheet">
+@endsection
 @extends('layouts.app')
 
 @section('content')
