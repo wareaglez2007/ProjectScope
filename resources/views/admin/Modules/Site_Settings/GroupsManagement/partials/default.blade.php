@@ -6,7 +6,7 @@
                   <span class="input-group-text" id="basic-addon1"><i class="bi bi-search"></i></span>
                 </div>
                 <input type="text" name="" id="search_groups" class="form-control" placeholder="type (i.e. admin, human resources ...)"
-                aria-describedby="helpId" onkeyup="groupsearch();">
+                aria-describedby="helpId" onkeyup="groupsearch();" autocomplete="off">
                 <div id="search_results" class="dropdown" style="position: static !important">
                 </div>
               </div>
