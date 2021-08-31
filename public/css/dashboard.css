@@ -52,6 +52,10 @@ body {
     text-decoration: none;
 }
 
+#navbar-top-sticky.fixed-top{
+    z-index: 2500 !important;
+}
+
 @media (max-width: 992px) {
     #navbar-second-light {
         margin-top: 0 !important;

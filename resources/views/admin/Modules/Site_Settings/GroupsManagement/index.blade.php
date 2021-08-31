@@ -1,3 +1,7 @@
+@section('head')
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+@endsection
 @extends('layouts.app')
 
 @section('content')
@@ -16,13 +20,15 @@
                             <li class="list-group-item"><a href="{{ route('admin.groups') }}">See Current Groups</a></li>
                         </ul>
                     </div>
-                    <div class="col-md-9">
+                    <div class="col-md-9" id="ajax_page">
                         @if (request()->path() == 'admin/groups')
                             @include('admin.Modules.Site_Settings.GroupsManagement.partials.default')
                         @endif
-                        @if (isset($id))
-                            @include('admin.Modules.Site_Settings.GroupsManagement.partials.show')
-                        @endif
+                        <div class="show_roles" id="show_roles_div">
+                            @if (Request::segment(3) == 'show')
+                                @include('admin.Modules.Site_Settings.GroupsManagement.partials.show')
+                            @endif
+                        </div>
                         @if (request()->path() == 'admin/groups/create')
                             @include('admin.Modules.Site_Settings.GroupsManagement.partials.create')
                         @endif
@@ -32,6 +38,7 @@
             </div>
         </div>
     </div>
-
+    {{-- DO NOT REMOVE THE javascript from here!!! --}}
+    <script src="{{ asset('js/groups.js') }}" defer></script>
 
 @endsection

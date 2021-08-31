@@ -14,7 +14,7 @@ class RolesController extends Controller
      */
     public function index()
     {
-       $roles =  Roles::orderBy('id', 'ASC')->paginate(8);
+       $roles =  Roles::orderBy('id', 'ASC')->paginate(20);
         return view('admin.Modules.Site_Settings.RolesManagement.index')->with([
             'modname' => 'Roles Management',
             'roles' => $roles

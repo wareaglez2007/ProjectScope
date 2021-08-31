@@ -13,6 +13,7 @@
     <!-- Scripts -->
     <script src="{{ asset('js/app.js') }}" defer></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.3/jquery-ui.min.js" defer></script>
+    @yield('head')
     <!-- Fonts -->
     <link rel="dns-prefetch" href="//fonts.gstatic.com">
     <link href="https://fonts.googleapis.com/css?family=Nunito" rel="stylesheet">
@@ -44,7 +45,7 @@
             </div>
         </nav>
         {{-- Second Navbar --}}
-        <nav class="navbar navbar-expand-md navbar-light bg-white shadow-sm" id="navbar-second-light">
+        <nav class="navbar navbar-expand-md navbar-light bg-white shadow-sm fixed-top" id="navbar-second-light">
             <a class="navbar-brand" href="{{ url('/') }}">
                 {{ config('app.name', 'Laravel') }}
             </a>
@@ -297,7 +298,7 @@
                 @endauth
 
 
-                <main role="main" class="col-md-9 ml-sm-auto col-lg-10 px-md-4">
+                <main role="main" class="col-md-9 ml-sm-auto col-lg-10 px-md-4" style="top:90px;">
                     <div class="table-responsive">
                         <main class="py-4" id="ajax_main_container">
                             @yield('content')
@@ -310,6 +311,7 @@
     </div>
 
     <script src="{{ asset('js/collapsemenuopen.js') }}" defer></script>
+    
 </body>
 
 </html>
