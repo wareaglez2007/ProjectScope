@@ -22,13 +22,18 @@
                             </li>
                             <li class="list-group-item"><a href="{{ route('admin.groups') }}">See Current Groups</a></li>
                         </ul>
+                        <div id="roles_groups_select2_index">
+                            @if (Request::segment(3) == 'show' && Request::segment(2) == 'groups' && Request::segment(1) == 'admin')
+                                @include('admin.Modules.Site_Settings.GroupsManagement.partials.rolegroupselection')
+                            @endif
+                        </div>
                     </div>
                     <div class="col-md-9" id="ajax_page">
                         @if (request()->path() == 'admin/groups')
                             @include('admin.Modules.Site_Settings.GroupsManagement.partials.default')
                         @endif
                         <div class="show_roles" id="show_roles_div">
-                            @if (Request::segment(3) == 'show')
+                            @if (Request::segment(3) == 'show' && Request::segment(2) == 'groups' && Request::segment(1) == 'admin')
                                 @include('admin.Modules.Site_Settings.GroupsManagement.partials.show')
                             @endif
                         </div>

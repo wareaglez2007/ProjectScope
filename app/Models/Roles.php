@@ -29,7 +29,7 @@ class Roles extends Model
                             'mod_access' => [
                                 'ALL_ADMIN_MODS' => [ //{includes: Profile, Settings, * under admin}
                                     'access_type' => ['FULL_CRUD', 'NO_DEL_SELF', 'NO_DEL_ADMIN', 'NONE_OTHERS'], // FULL access to all the modules but with some restrictions
-                                    'access_grants' => ['ANY_OTHER_MOD']  //ONLY SPECIAL CASE 
+                                    'access_grants' => ['ANY_OTHER_MOD']  //ONLY SPECIAL CASE
                                 ]
                             ],
 
@@ -145,4 +145,12 @@ class Roles extends Model
 
         ]
     ];
+
+
+
+
+    public function GetGroupsRoles()
+    {
+        return $this->belongsToMany(Groups::class, Roles::class);
+    }
 }

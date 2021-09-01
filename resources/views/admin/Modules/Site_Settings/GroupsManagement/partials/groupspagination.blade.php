@@ -7,17 +7,30 @@
                 <tr>
                     <th>Group Id</th>
                     <th>Group Name</th>
+                    <th>Assigned Roles Count</th>
                     <th>Updated On</th>
                     <th>Actions</th>
                 </tr>
             </thead>
             <tbody>
                 @foreach ($groups as $group)
+                    @php
+                        foreach ($roles_count as $role_count) {
+                            if ($group->id == $role_count->id) {
+                                $assigned_roles_count = $role_count->Roles->count();
+                            }
+                        }
+                    @endphp
                     <tr>
                         <td scope="row"><a href="{{ route('admin.groups.show', ['id' => $group->id]) }}"
                                 class="text-muted">{{ $group->id }}</a></td>
                         <td><a href="{{ route('admin.groups.show', ['id' => $group->id]) }}" class="text-muted">
                                 {{ $group->name }}</a>
+                        </td>
+                        <td><a href="{{ route('admin.groups.show', ['id' => $group->id]) }}"
+                                class="badge badge-pill badge-dark">
+                                {{ $assigned_roles_count }}
+                            </a>
                         </td>
                         <td>
                             <a href="{{ route('admin.groups.show', ['id' => $group->id]) }}"

@@ -46,16 +46,23 @@ class Groups extends Model
         }
     }
 
+    public function RolesforGroups(){
+        return $this->belongsToMany(Roles::class);
+    }
+
     /**
      * I will need to create a relation between Groups and Roles
      * Groups_id
      * Roles_id
      */
 
-    public function Roles(String $var = null)
+    public function Roles()
     {
-        return $this->hasMany(GroupsRoles::class);
+        return $this->belongsToMany(Roles::class);
     }
+
+
+
     public function GroupRoles()
     {
         return $this->hasMany(GroupsRoles::class);

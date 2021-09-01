@@ -48,8 +48,11 @@ Route::middleware('auth')->prefix('admin')->group(function () {
     Route::get('groups/show/{id}', [App\Http\Controllers\GroupsController::class, 'show'])->name('admin.groups.show');
     Route::get('groups/groupspagination', [App\Http\Controllers\GroupsController::class, 'GroupsAjaxPaginationdata']);
     Route::post('groups/search', [App\Http\Controllers\GroupsController::class, 'search']);
+    Route::post('groups/search/roles', [App\Http\Controllers\GroupsController::class, 'searchRoles']);
     //groupsrolespagination
     Route::get('groups/show/{id}/groupsrolespagination', [App\Http\Controllers\GroupsController::class, 'GroupsRolesAjaxPaginationdata']);
+    //Select 2
+    Route::get('groups/show/{id}/rolesupdate', [App\Http\Controllers\GroupsController::class, 'updatewithSelect2']);
     /**
      * Roles Controller
      */
