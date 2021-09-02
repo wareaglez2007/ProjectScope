@@ -14,8 +14,10 @@ $(function () {
      */
     $(document).on('click', '#groups_default_pagination .pagination a', function (event) {
         event.preventDefault();
+        var group_status = $("#group_status").val();
         var page = $(this).attr('href').split('page=')[1];
-        fetch_data(page);
+
+        fetch_data(page, group_status);
     });
 
 
@@ -26,6 +28,7 @@ $(function () {
         event.preventDefault();
         var gp_id = $("#use_for_group_id").val();
         var page = $(this).attr('href').split('page=')[1];
+
         fetch_role_data(page, gp_id);
     });
 
@@ -65,12 +68,14 @@ function UpdateGroupsRoles(role_id, group_id) {
             var toast_message = "";
             if (typeof data != 'undefined') {
                 var current_page = $("#roles_groups_current_page").val();
+
                 $('#roles_groups_select2_index').html(data.view); //<< !!Attention: it returns the select2 see function details at top!!
 
                 if (typeof data.response.error != 'undefined') {
                     toastcolor = "#dc3545";
                     toast_message = data.response.error;
                 } else {
+                    $("#ajax_message").text('');
                     toastcolor = "#04AA6D";
                     toast_message = data.response.success;
                 }
@@ -93,9 +98,14 @@ function UpdateGroupsRoles(role_id, group_id) {
  * @controller GroupsAjaxPaginationdata
  * @returns Blade view: GroupsManagement.partials.groupspagination
  */
-function fetch_data(page) {
+function fetch_data(page, status) {
+    console.log(status);
+    var url = "";
+
+        url = "/admin/groups/groupspagination?page=" + page+"&status="+status;
+
     $.ajax({
-        url: "/admin/groups/groupspagination?page=" + page,
+        url: url,
         success: function (data) {
             $('#groups_data').html(data); //Must be html not replaceWith
         }
@@ -124,6 +134,7 @@ function fetch_role_data(page, id) {
  */
 function groupsearch() {
     var search_q = $("#search_groups").val();
+    var group_status = $("#group_status").val();
     $.ajaxSetup({
         headers: {
             'X-CSRF-TOKEN': $(
@@ -139,18 +150,28 @@ function groupsearch() {
         //cache: false,
         data: {
             search_q: search_q,
+            status : group_status
 
         },
         success: function (data) {
             var toastcolor = "";
             var toast_message = "";
             if (typeof data != 'undefined') {
-                $('#groups_data').html(data);
+                $('#groups_data').html(data.view);
             }
         }, //end of success
         error: function (error) {
             console.log(error);
             if (typeof error.responseJSON.message != 'undefined') {
+                toastcolor = "#dc3545";
+                toast_message = error.responseJSON.message;
+
+                //HandleAjaxResponsesToast(1050, toastcolor, mess_count, toast_message, 422);
+
+                $.each(error.responseJSON.errors, function (index, val) {
+                    HandleAjaxResponsesToast(2300, toastcolor, index, val, error.status);
+
+                });
             }
 
         } //end of error
@@ -236,7 +257,7 @@ function UpdateGroupName(group_id) {
 
     }); //End of ajax setup
     $.ajax({
-        url: '/admin/groups/show/'+group_id+'/updategroup?page=' + current_page,
+        url: '/admin/groups/show/' + group_id + '/updategroup?page=' + current_page,
         method: "get",
         //cache: false,
         data: {
@@ -276,13 +297,16 @@ function UpdateGroupName(group_id) {
 
         } //end of error
     }); //end of ajax
-  }
+}
 
-
-function CreateNewGroup(){
-   var group_name =  $("#group_name").val();
-     //Submit form
-     $.ajaxSetup({
+/**
+ * @controller store
+ * @returns Blade view:GroupsManagement.partials.create
+ */
+function CreateNewGroup() {
+    var group_name = $("#group_name").val();
+    //Submit form
+    $.ajaxSetup({
         headers: {
             'X-CSRF-TOKEN': $(
                 'meta[name="csrf-token"]')
@@ -303,6 +327,200 @@ function CreateNewGroup(){
             var toast_message = "";
             if (typeof data != 'undefined') {
                 $('#create_group_div').html(data.view); //<< !!Attention: it returns the select2 see function details at top!!
+
+                if (typeof data.response.error != 'undefined') {
+                    toastcolor = "#dc3545";
+                    toast_message = data.response.error;
+                } else {
+                    toastcolor = "#04AA6D";
+                    toast_message = data.response.success;
+                }
+                HandleAjaxResponsesToast(1050, toastcolor, 1, toast_message, 200);
+            }
+        }, //end of success
+        error: function (error) {
+
+            if (typeof error.responseJSON.message != 'undefined') {
+                toastcolor = "#dc3545";
+                toast_message = error.responseJSON.message;
+
+                //HandleAjaxResponsesToast(1050, toastcolor, mess_count, toast_message, 422);
+
+                $.each(error.responseJSON.errors, function (index, val) {
+                    HandleAjaxResponsesToast(2300, toastcolor, index, val, error.status);
+
+                });
+            }
+
+        } //end of error
+    }); //end of ajax
+}
+
+/**
+ * 09-02-2021
+ * @param int group_id
+ * @controller destroy
+ * @returns Blade view: GroupsManagement.partials.groupspagination
+ */
+function DestoryGroup(group_id) {
+    var current_page = $("#groups_current_page").val();
+    var groups_per_page = $('#groups_per_page_count').val();
+    var groups_last_page = $("#groups_last_page").val();
+    var group_status = $("#group_status").val();
+    if((current_page == groups_last_page) && groups_per_page == 1){
+        current_page = 1; //end of the line
+    }
+    $.ajaxSetup({
+        headers: {
+            'X-CSRF-TOKEN': $(
+                'meta[name="csrf-token"]')
+                .attr(
+                    'content')
+        }
+
+    }); //End of ajax setup
+    $.ajax({
+        url: '/admin/groups/destroy?page=' + current_page+"&status="+group_status,
+        method: "post",
+        //cache: false,
+        data: {
+            id: group_id
+        },
+        success: function (data) {
+            var toastcolor = "";
+            var toast_message = "";
+            if (typeof data != 'undefined') {
+                $('#groups_data').html(data.view);
+
+                if (typeof data.response.error != 'undefined') {
+                    toastcolor = "#dc3545";
+                    toast_message = data.response.error;
+                } else {
+                    toastcolor = "#04AA6D";
+                    toast_message = data.response.success;
+                }
+                HandleAjaxResponsesToast(1050, toastcolor, 1, toast_message, 200);
+            }
+        }, //end of success
+        error: function (error) {
+
+            if (typeof error.responseJSON.message != 'undefined') {
+                toastcolor = "#dc3545";
+                toast_message = error.responseJSON.message;
+
+                //HandleAjaxResponsesToast(1050, toastcolor, mess_count, toast_message, 422);
+
+                $.each(error.responseJSON.errors, function (index, val) {
+                    HandleAjaxResponsesToast(2300, toastcolor, index, val, error.status);
+
+                });
+            }
+
+        } //end of error
+    }); //end of ajax
+}
+
+
+/**
+ * 09-02-2021
+ * @param int group_id
+ * @controller delete
+ * @returns Blade view: GroupsManagement.partials.groupspagination
+ */
+ function DeleteGroup(group_id) {
+    var current_page = $("#groups_current_page").val();
+    var groups_per_page = $('#groups_per_page_count').val();
+    var groups_last_page = $("#groups_last_page").val();
+    var group_status = $("#group_status").val();
+    if((current_page == groups_last_page) && groups_per_page == 1){
+        current_page = 1; //end of the line
+    }
+    $.ajaxSetup({
+        headers: {
+            'X-CSRF-TOKEN': $(
+                'meta[name="csrf-token"]')
+                .attr(
+                    'content')
+        }
+
+    }); //End of ajax setup
+    $.ajax({
+        url: '/admin/groups/delete?page=' + current_page+"&status="+group_status,
+        method: "post",
+        //cache: false,
+        data: {
+            id: group_id
+        },
+        success: function (data) {
+            var toastcolor = "";
+            var toast_message = "";
+            if (typeof data != 'undefined') {
+                $('#groups_data').html(data.view);
+
+                if (typeof data.response.error != 'undefined') {
+                    toastcolor = "#dc3545";
+                    toast_message = data.response.error;
+                } else {
+                    toastcolor = "#04AA6D";
+                    toast_message = data.response.success;
+                }
+                HandleAjaxResponsesToast(1050, toastcolor, 1, toast_message, 200);
+            }
+        }, //end of success
+        error: function (error) {
+
+            if (typeof error.responseJSON.message != 'undefined') {
+                toastcolor = "#dc3545";
+                toast_message = error.responseJSON.message;
+
+                //HandleAjaxResponsesToast(1050, toastcolor, mess_count, toast_message, 422);
+
+                $.each(error.responseJSON.errors, function (index, val) {
+                    HandleAjaxResponsesToast(2300, toastcolor, index, val, error.status);
+
+                });
+            }
+
+        } //end of error
+    }); //end of ajax
+}
+
+
+/**
+ * 09-02-2021
+ * @param int group_id
+ * @controller activate
+ * @returns Blade view: GroupsManagement.partials.groupspagination
+ */
+ function ActivateGroup(group_id) {
+    var current_page = $("#groups_current_page").val();
+    var groups_per_page = $('#groups_per_page_count').val();
+    var groups_last_page = $("#groups_last_page").val();
+    var group_status = $("#group_status").val();
+    if((current_page == groups_last_page) && groups_per_page == 1){
+        current_page = 1; //end of the line
+    }
+    $.ajaxSetup({
+        headers: {
+            'X-CSRF-TOKEN': $(
+                'meta[name="csrf-token"]')
+                .attr(
+                    'content')
+        }
+
+    }); //End of ajax setup
+    $.ajax({
+        url: '/admin/groups/activate?page=' + current_page+"&status="+group_status,
+        method: "post",
+        //cache: false,
+        data: {
+            id: group_id
+        },
+        success: function (data) {
+            var toastcolor = "";
+            var toast_message = "";
+            if (typeof data != 'undefined') {
+                $('#groups_data').html(data.view);
 
                 if (typeof data.response.error != 'undefined') {
                     toastcolor = "#dc3545";

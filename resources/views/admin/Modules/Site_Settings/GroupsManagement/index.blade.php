@@ -18,9 +18,13 @@
                     {{-- Manage Groups --}}
                     <div class="col-md-3">
                         <ul class="list-group">
-                            <li class="list-group-item"><a href="{{ route('admin.groups.create') }}">Create new group</a>
+                            <li class="list-group-item"><a href="{{ route('admin.groups.create') }}"
+                                    class="btn btn-success">Create new group</a>
                             </li>
-                            <li class="list-group-item"><a href="{{ route('admin.groups') }}">See Current Groups</a></li>
+                            <li class="list-group-item"><a href="{{ route('admin.groups', ['status' => 1]) }}">See
+                                    Active Groups</a></li>
+                            <li class="list-group-item"><a href="{{ route('admin.groups', ['status' => 2]) }}">See Inactive
+                                    Groups</a></li>
                         </ul>
                         <div id="roles_groups_select2_index">
                             @if (Request::segment(3) == 'show' && Request::segment(2) == 'groups' && Request::segment(1) == 'admin')
@@ -32,15 +36,16 @@
                         @if (request()->path() == 'admin/groups')
                             @include('admin.Modules.Site_Settings.GroupsManagement.partials.default')
                         @endif
+
                         <div class="show_roles" id="show_roles_div">
                             @if (Request::segment(3) == 'show' && Request::segment(2) == 'groups' && Request::segment(1) == 'admin')
                                 @include('admin.Modules.Site_Settings.GroupsManagement.partials.show')
                             @endif
                         </div>
 
-                            @if (request()->path() == 'admin/groups/create')
-                                @include('admin.Modules.Site_Settings.GroupsManagement.partials.create')
-                            @endif
+                        @if (request()->path() == 'admin/groups/create')
+                            @include('admin.Modules.Site_Settings.GroupsManagement.partials.create')
+                        @endif
 
 
                     </div>

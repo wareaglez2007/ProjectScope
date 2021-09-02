@@ -260,7 +260,7 @@
                                             </a>
                                             <div class="collapse hide" id="collapseFive" class="___class_+?70___"
                                                 aria-labelledby="headingFive" data-parent="#accordionFive">
-                                                <a href="{{ route('admin.groups') }}"
+                                                <a href="{{ route('admin.groups', ['status' => 1]) }}"
                                                     class="list-group-item nav-link {{ $active1 }}"><i
                                                         class="bi bi-diagram-3"></i>&nbsp;Groups</a>
                                                 <a href="{{ route('admin.roles') }}"

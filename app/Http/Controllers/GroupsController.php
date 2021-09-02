@@ -7,7 +7,7 @@ use App\Models\GroupsRoles;
 use App\Models\Roles;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-
+use Symfony\Component\ErrorHandler\ErrorHandler;
 
 class GroupsController extends Controller
 {
@@ -37,15 +37,26 @@ class GroupsController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        $gp = $this->groups->all();
+
+        if ($request->status == 1) {
+            $groups = $this->groups->GetAllGroups(null, true, 6, 'name', 'ASC');
+            $gp = $this->groups->all();
+            $active = 1;
+        } else {
+            $groups = $this->groups->GetAllGroups(null, true, 6, 'name', 'ASC', true);
+            $gp = $this->groups->onlyTrashed()->with('Roles')->get();
+            $active = 0;
+        }
+
         return view('admin.Modules.Site_Settings.GroupsManagement.index')->with([
             'modname' => 'Gruop Management',
             'count' => $this->groups->GetGroupCount(),
-            'groups' => $this->groups->GetAllGroups(null, true, 8, 'id', 'ASC'),
+            'groups' => $groups,
             'id' => $this->getGroup_id(),
-            'roles_count' => $gp
+            'roles_count' => $gp,
+            'group_status' => $active
         ]);
     }
 
@@ -59,7 +70,7 @@ class GroupsController extends Controller
         return view('admin.Modules.Site_Settings.GroupsManagement.index')->with([
             'modname' => 'Gruop Management - Create New Group',
             'count' => $this->groups->GetGroupCount(),
-            'groups' => $this->groups->GetAllGroups(null, true, 8, 'id', 'ASC'),
+            'groups' => $this->groups->GetAllGroups(null, true, 6, 'name', 'ASC'),
             'id' => $this->getGroup_id()
         ]);
     }
@@ -102,13 +113,10 @@ class GroupsController extends Controller
     public function show($id)
     {
         $this->setGroup_id($id);
-        $group = Groups::findorfail($id);
-        $roles_assigned = $this->groups->find($id)->Roles()->get();
+        $group = Groups::withTrashed()->findorfail($id);
+        $roles_assigned = $this->groups->withTrashed()->find($id)->Roles()->get();
         $roles_count = GroupsRoles::count();
-
-
-        $roles = Roles::orderby('id', 'ASC')->paginate(8);
-
+        $roles = Roles::orderby('name', 'ASC')->paginate(8);
         $roles_2 = Roles::orderby('name', 'ASC')->get();
         return view('admin.Modules.Site_Settings.GroupsManagement.index')->with([
             'modname' => 'Gruop Management - Individual Group View',
@@ -145,10 +153,9 @@ class GroupsController extends Controller
 
         $selected_roles = $request->role_id; //if nothing selected, NULL else it will return an array
         $group_id = $request->group_id;
-        // $current_assigned_roles_to_group = $this->groups->find($group_id)->GroupRoles()->get(); //Array
-        //$current_assigned_count = $this->groups->find($group_id)->GroupRoles()->get()->count(); //int
         $role_names = Roles::findorfail($selected_roles);
-        $group_names = Groups::findorfail($group_id);
+        $group_names = Groups::withTrashed()->findorfail($group_id);
+
         $response_messages['success'] = "";
 
         $query = $groupsRoles->where('groups_id', $group_id)->where('roles_id', $selected_roles)->count();
@@ -167,9 +174,9 @@ class GroupsController extends Controller
         }
         $roles_2 = Roles::orderby('name', 'ASC')->get();
         $this->setGroup_id($group_id);
-        $group = Groups::findorfail($group_id);
-        $roles_assigned = $this->groups->find($group_id)->Roles()->get();
-        $roles = Roles::orderby('id', 'ASC')->paginate(8);
+        $group = Groups::withTrashed()->findorfail($group_id);
+        $roles_assigned = $this->groups->withTrashed()->find($group_id)->Roles()->get();
+        $roles = Roles::orderby('name', 'ASC')->paginate(8);
         if ($request->ajax()) {
             return response()->json([
                 "response" => $response_messages,
@@ -187,33 +194,143 @@ class GroupsController extends Controller
     }
 
     /**
-     * Remove the specified resource from storage.
+     * trash the specified resource from storage.
      *
-     * @param  int  $id
+     * @param  Request $request
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy(Request $request)
     {
-        //
+        if ($request->id != null) {
+            if ($request->id != Groups::ADMIN_GROUP) {
+                $this->groups->where('id', $request->id)->whereNotIn('id',  [Groups::ADMIN_GROUP])->delete();
+                $response_messages['success'] = "Group has been deativated!";
+            } else {
+                $response_messages['error'] = "You cannot deativate this group";
+            }
+            $gp = $this->groups->all();
+            if ($request->ajax()) {
+                return response()->json([
+                    "response" => $response_messages,
+                    'modname' => 'Group Management',
+                    'view' => view('admin.Modules.Site_Settings.GroupsManagement.partials.groupspagination')->with([
+                        'modname' => 'Gruop Management',
+                        'count' => $this->groups->GetGroupCount(),
+                        'groups' => $this->groups->GetAllGroups(null, true, 6, 'name', 'ASC'),
+                        'roles_count' => $gp,
+                    ])->render()
+                ]);
+            }
+        }
     }
 
+    /**
+     * Remove the specified resource from storage.
+     *
+     * @param  Request $request
+     * @return \Illuminate\Http\Response
+     */
+    public function delete(Request $request)
+    {
+        if ($request->id != null) {
+            if ($request->id != Groups::ADMIN_GROUP) {
+                $delete =  $this->groups->where('id', $request->id)->whereNotIn('id',  [Groups::ADMIN_GROUP])->forceDelete();
+                if ($delete) {
+                    $response_messages['success'] = "Group has been deleted!";
+                } else {
+                    $response_messages['error'] = "Unable to delete. Delete function in GroupsController.";
+                }
+            } else {
+                $response_messages['error'] = "You cannot delete this group";
+            }
+            if ($request->status == 1) {
+                $groups = $this->groups->GetAllGroups(null, true, 6, 'name', 'ASC');
+                $gp = $this->groups->all();
+            } else {
+                $groups = $this->groups->GetAllGroups(null, true, 6, 'name', 'ASC', true);
+                $gp = $this->groups->onlyTrashed()->with('Roles')->get();
+            }
+            if ($request->ajax()) {
+                return response()->json([
+                    "response" => $response_messages,
+                    'modname' => 'Group Management',
+                    'view' => view('admin.Modules.Site_Settings.GroupsManagement.partials.groupspagination')->with([
+                        'modname' => 'Gruop Management',
+                        'count' => $this->groups->GetGroupCount(),
+                        'groups' => $groups,
+                        'roles_count' => $gp
+                    ])->render()
+                ]);
+            }
+        }
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     *
+     * @param  Request $request
+     * @return \Illuminate\Http\Response
+     */
+    public function activate(Request $request)
+    {
+        if ($request->id != null) {
+            if ($request->id != Groups::ADMIN_GROUP) {
+                $activate =  $this->groups->withTrashed()->find($request->id)->restore();
+                if ($activate) {
+                    $response_messages['success'] = "Group has been activated!";
+                } else {
+                    $response_messages['error'] = "Unable to restore!";
+                }
 
 
-    /*****************AJAX */
+                if ($request->status == 1) {
+                    $groups = $this->groups->GetAllGroups(null, true, 6, 'name', 'ASC');
+                    $gp = $this->groups->all();
+                } else {
+                    $groups = $this->groups->GetAllGroups(null, true, 6, 'name', 'ASC', true);
+                    $gp = $this->groups->onlyTrashed()->with('Roles')->get();
+                }
+            } else {
+                $response_messages['error'] = "You cannot delete this group";
+            }
+            if ($request->ajax()) {
+                return response()->json([
+                    "response" => $response_messages,
+                    'modname' => 'Group Management',
+                    'view' => view('admin.Modules.Site_Settings.GroupsManagement.partials.groupspagination')->with([
+                        'modname' => 'Gruop Management',
+                        'count' => $this->groups->GetGroupCount(),
+                        'groups' => $groups,
+                        'roles_count' => $gp
+                    ])->render()
+                ]);
+            }
+        }
+    }
 
-
-
-
+    /**
+     *
+     */
     public function GroupsAjaxPaginationdata(Request $request)
     {
-        $gp = $this->groups->all();
+        // if(isset($request->group_status)){
+        if ($request->status == 1) {
+            $groups = $this->groups->GetAllGroups(null, true, 6, 'name', 'ASC');
+            $gp = $this->groups->all();
+        } else {
+            $groups = $this->groups->GetAllGroups(null, true, 6, 'name', 'ASC', true);
+            $gp = $this->groups->onlyTrashed()->with('Roles')->get();
+        }
+
+
+        // }
         if ($request->ajax()) {
 
             return view('admin.Modules.Site_Settings.GroupsManagement.partials.groupspagination')->with([
                 'modname' => 'Gruop Management',
                 'count' => $this->groups->GetGroupCount(),
-                'groups' => $this->groups->GetAllGroups(null, true, 8, 'id', 'ASC'),
-                'roles_count' => $gp
+                'groups' => $groups,
+                'roles_count' => $gp,
             ])->render();
         }
     }
@@ -221,14 +338,14 @@ class GroupsController extends Controller
 
     public function GroupsRolesAjaxPaginationdata(Request $request, $id)
     {
-        //dump($id);
+
         $this->setGroup_id($id);
-        $group = Groups::findorfail($id);
-        $roles_assigned = $this->groups->findorfail($id)->Roles()->get();
+        $group = Groups::withTrashed()->findorfail($id);
+        $roles_assigned = $this->groups->withTrashed()->find($id)->Roles()->get();
 
         //dd($roles_assigned);
 
-        $roles = Roles::orderby('id', 'ASC')->paginate(8);
+        $roles = Roles::orderby('name', 'ASC')->paginate(8);
         $roles_count = GroupsRoles::count();
         $roles_2 = Roles::orderby('name', 'ASC')->get();
         if ($request->ajax()) {
@@ -255,39 +372,48 @@ class GroupsController extends Controller
     {
 
         if (isset($request->search_q) && $request->search_q != null) {
-            $query = $request->search_q;
-            $data = Groups::where('name', 'LIKE', "%{$query}%")->paginate(10);
-            // if(is_countable($data) && count($data) > 0){
-            //     $output = '<div class="dropdown-menu" aria-labelledby="dropdownMenuButton" style="display:block;">';
-            //     foreach ($data as $row) {
-            //         $output .= '<a class="dropdown-item" href="'.route('admin.groups.show', ['id' => $row->id]).'">' . $row->name . '</a>';
-            //     }
-            //     $output .= '</div>';
-            // }else{
-            //     $output = '<div class="dropdown-menu" aria-labelledby="dropdownMenuButton" style="display:block;">';
-            //     $output .= '<a class="dropdown-item" href="#">0 Results found</a>';
-            //     $output .= '</div>';
-            // }
 
-            // echo $output;
-            $gp = $this->groups->all();
+
+            if ($request->status == 1) {
+                $query = $request->search_q;
+                $groups = Groups::withTrashed(false)->where('name', 'LIKE', "%{$query}%")->paginate(6);
+                //dd($groups);
+                $gp = $this->groups->all();
+            } else {
+                $query = $request->search_q;
+                $groups = Groups::onlyTrashed()->where('name', 'LIKE', "%{$query}%")->paginate(6);
+                $gp = $this->groups->onlyTrashed()->with('Roles')->get();
+            }
             if ($request->ajax()) {
-
-                return view('admin.Modules.Site_Settings.GroupsManagement.partials.groupspagination')->with([
-                    'modname' => 'Gruop Management',
-                    'count' => $this->groups->GetGroupCount(),
-                    'groups' => $data,
-                    'roles_count' => $gp
-                ])->render();
+                return response()->json([
+                    'modname' => 'Group Management',
+                    'view' => view('admin.Modules.Site_Settings.GroupsManagement.partials.groupspagination')->with([
+                        'modname' => 'Gruop Management',
+                        'count' => $this->groups->GetGroupCount(),
+                        'groups' => $groups,
+                        'roles_count' => $gp,
+                    ])->render()
+                ]);
             }
         } else {
-            $gp = $this->groups->all();
-            return view('admin.Modules.Site_Settings.GroupsManagement.partials.groupspagination')->with([
-                'modname' => 'Gruop Management',
-                'count' => $this->groups->GetGroupCount(),
-                'groups' => $this->groups->GetAllGroups(null, true, 8, 'id', 'ASC'),
-                'roles_count' => $gp
-            ])->render();
+            if ($request->status == 1) {
+                $groups = $this->groups->GetAllGroups(null, true, 6, 'name', 'ASC');
+                $gp = $this->groups->all();
+            } else {
+
+                $groups = $this->groups->GetAllGroups(null, true, 6, 'name', 'ASC', true);
+                $gp = $this->groups->onlyTrashed()->with('Roles')->get();
+            }
+
+            return response()->json([
+                'modname' => 'Group Management',
+                'view' => view('admin.Modules.Site_Settings.GroupsManagement.partials.groupspagination')->with([
+                    'modname' => 'Gruop Management',
+                    'count' => $this->groups->GetGroupCount(),
+                    'groups' => $groups,
+                    'roles_count' => $gp,
+                ])->render()
+            ]);
         }
     }
 
@@ -297,10 +423,8 @@ class GroupsController extends Controller
     {
         $selected_roles = $request->role_id; //if nothing selected, NULL else it will return an array
         $group_id = $request->group_id;
-        // $current_assigned_roles_to_group = $this->groups->find($group_id)->GroupRoles()->get(); //Array
-        //$current_assigned_count = $this->groups->find($group_id)->GroupRoles()->get()->count(); //int
         $role_names = Roles::findorfail($selected_roles);
-        $group_names = Groups::findorfail($group_id);
+        $group_names = Groups::withTrashed()->findorfail($group_id);
         $response_messages['success'] = "";
 
         $query = $groupsRoles->where('groups_id', $group_id)->where('roles_id', $selected_roles)->count();
@@ -319,9 +443,9 @@ class GroupsController extends Controller
         }
         $roles_2 = Roles::orderby('name', 'ASC')->get();
         $this->setGroup_id($group_id);
-        $group = Groups::findorfail($group_id);
-        $roles_assigned = $this->groups->findorfail($group_id)->Roles()->get();
-        $roles = Roles::orderby('id', 'ASC')->paginate(8);
+        $group = Groups::withTrashed()->findorfail($group_id);
+        $roles_assigned = $this->groups->withTrashed()->find($group_id)->Roles()->get();
+        $roles = Roles::orderby('name', 'ASC')->paginate(8);
         if ($request->ajax()) {
             return response()->json([
                 "response" => $response_messages,
@@ -345,24 +469,15 @@ class GroupsController extends Controller
     {
 
         $group_id = $request->group_id;
-        // $current_assigned_roles_to_group = $this->groups->find($group_id)->GroupRoles()->get(); //Array
-        //$current_assigned_count = $this->groups->find($group_id)->GroupRoles()->get()->count(); //int
-
         $group_names = Groups::findorfail($group_id);
         $response_messages['success'] = "";
-
-        //Validation
-        //'|unique:groups,name'
         if (strtolower($group_names->name) != strtolower($request->name)) {
             $validatedData = $request->validate([
                 'name' => 'required|unique:groups,name',
 
             ]);
         }
-
-
         $query = $groups->findorfail($group_id);
-        //dd($query);
         if ($query) {
 
             $update_groups = $groups->where('id', $group_id)->update([
@@ -376,9 +491,9 @@ class GroupsController extends Controller
         }
         $roles_2 = Roles::orderby('name', 'ASC')->get();
         $this->setGroup_id($group_id);
-        $group = Groups::findorfail($group_id);
-        $roles_assigned = $this->groups->findorfail($group_id)->Roles()->get();
-        $roles = Roles::orderby('id', 'ASC')->paginate(8);
+        $group = Groups::withTrashed()->findorfail($group_id);
+        $roles_assigned = $this->groups->withTrashed()->find($group_id)->Roles()->get();
+        $roles = Roles::orderby('name', 'ASC')->paginate(8);
         if ($request->ajax()) {
             return response()->json([
                 "response" => $response_messages,

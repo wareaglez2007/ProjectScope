@@ -46,9 +46,19 @@
                                     <a class="dropdown-item"
                                         href="{{ route('admin.groups.show', ['id' => $group->id]) }}"><i
                                             class="bi bi-pencil"></i>&nbsp;Edit</a>
-                                    <a class="dropdown-item" href="{{ route('admin.groups') }}"><i
-                                            class="bi bi-lightbulb-off"></i>&nbsp;Deactivate</a>
-                                    <a class="dropdown-item" href="{{ route('admin.groups') }}"><i
+                                    @if (request()->status == 1)
+                                        <a class="dropdown-item" href="#"
+                                            onclick="event.preventDefault();DestoryGroup({{ $group->id }});"><i
+                                                class="bi bi-lightbulb-off"></i>&nbsp;Deactivate</a>
+                                    @endif
+                                    @if (request()->status == 2)
+                                        <a class="dropdown-item" href="#"
+                                            onclick="event.preventDefault();ActivateGroup({{ $group->id }});"><i
+                                                class="bi bi-lightbulb-fill"></i>&nbsp;Activate</a>
+                                    @endif
+
+                                    <a class="dropdown-item" href="#"
+                                        onclick="event.preventDefault();DeleteGroup({{ $group->id }});"><i
                                             class="bi bi-trash"></i>&nbsp;Delete</a>
                                 </div>
                             </div>
@@ -60,7 +70,12 @@
         <div id="groups_default_pagination">
             {{ $groups->links() }}
         </div>
+
+        <input type="hidden" id="groups_current_page" value="{{ $groups->currentPage() }}" />
+        <input type="hidden" id="groups_last_page" value="{{ $groups->lastPage() }}" />
+        <input type="hidden" id="groups_per_page_count" value="{{ $groups->count() }}" />
     @else
-        <p>There no groups currently added to database.</p>
+        <p>0 results were found.</p>
     @endif
+    <input type="hidden" id="group_status" value="{{ request()->status }}" />
 </div>

@@ -55,6 +55,12 @@ Route::middleware('auth')->prefix('admin')->group(function () {
     Route::get('groups/show/{id}/rolesupdate', [App\Http\Controllers\GroupsController::class, 'updatewithSelect2']);
     //Group name update = '/admin/groups/show/'+group_id+'/updategroup
     Route::get('groups/show/{id}/updategroup', [App\Http\Controllers\GroupsController::class, 'updateGroupName']);
+    //Destroy
+    Route::post('groups/destroy', [App\Http\Controllers\GroupsController::class, 'destroy'])->name('admin.groups.destroy');
+    //Delete
+    Route::post('groups/delete', [App\Http\Controllers\GroupsController::class, 'delete'])->name('admin.groups.delete');
+    //Activate
+    Route::post('groups/activate', [App\Http\Controllers\GroupsController::class, 'activate'])->name('admin.groups.activate');
     /**
      * Roles Controller
      */

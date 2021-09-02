@@ -3,12 +3,13 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Model;
 
 class Groups extends Model
 {
     use HasFactory;
-
+    use SoftDeletes;
     /**
      * The attributes that are mass assignable.
      *
@@ -16,8 +17,11 @@ class Groups extends Model
      */
     protected $fillable = [
         'name',
+        'deleted_at',
         'updated_at'
     ];
+
+    public const ADMIN_GROUP = 1;
 
     /**
      * @param String where
@@ -37,16 +41,21 @@ class Groups extends Model
      * @param String where
      * @return array from groups table
      */
-    public function GetAllGroups(String $where = null, $paginate = false, int $paginate_num = 0, String $paginate_sortby = null, String $paginate_direction = 'ASC')
+    public function GetAllGroups(String $where = null, $paginate = false, int $paginate_num = 0, String $paginate_sortby = null, String $paginate_direction = 'ASC', $trashed = false)
     {
-        if ($paginate) {
+        if ($paginate && !$trashed) {
             return $this->with('GroupRoles')->orderby($paginate_sortby, $paginate_direction)->paginate($paginate_num);
+        } else if ($paginate && $trashed) {
+            return $this->onlyTrashed()->with('GroupRoles')->orderby($paginate_sortby, $paginate_direction)->paginate($paginate_num);
+        } else if ($trashed && !$paginate) {
+            return $this->withTrashed()->orderby($paginate_sortby, $paginate_direction)->get();
         } else {
             return $this->get();
         }
     }
 
-    public function RolesforGroups(){
+    public function RolesforGroups()
+    {
         return $this->belongsToMany(Roles::class);
     }
 
