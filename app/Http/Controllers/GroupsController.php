@@ -73,8 +73,24 @@ class GroupsController extends Controller
     public function store(Request $request)
     {
         //When the request comes
+        $response_messages['success'] = "";
         //1. Check and make sure that the group does not exist already
+        $validatedData = $request->validate([
+            'name' => 'required|unique:groups,name',
+
+        ]);
         //2. If everything ok, then store into database.
+        $create = Groups::create(array('name' => $request->name));
+        $response_messages['success'] = "Group " . $request->name . " has been added.";
+        if ($request->ajax()) {
+            return response()->json([
+                "response" => $response_messages,
+
+                'view' => view('admin.Modules.Site_Settings.GroupsManagement.partials.create')->with([
+                    'modname' => 'Gruop Management - Create New Group',
+                ])->render()
+            ]);
+        }
     }
 
     /**
@@ -300,6 +316,63 @@ class GroupsController extends Controller
             $save_new_roles->save();
             $update_date_groups = $groups->where('id', $group_id)->update(['updated_at' => now()]);
             $response_messages['success'] = "Role " . $role_names->name . " has been added to " . $group_names->name;
+        }
+        $roles_2 = Roles::orderby('name', 'ASC')->get();
+        $this->setGroup_id($group_id);
+        $group = Groups::findorfail($group_id);
+        $roles_assigned = $this->groups->findorfail($group_id)->Roles()->get();
+        $roles = Roles::orderby('id', 'ASC')->paginate(8);
+        if ($request->ajax()) {
+            return response()->json([
+                "response" => $response_messages,
+                'modname' => 'Gruop Management - Individual Group View',
+                'view' => view('admin.Modules.Site_Settings.GroupsManagement.partials.rolesgroupspagination')->with([
+                    'count' => $this->groups->GetGroupCount(),
+                    'group' => $group,
+                    'id' => $group_id,
+                    'roles' => $roles,
+                    'roles2' => $roles_2,
+                    'roles_assigned' => $roles_assigned,
+                ])->render()
+            ]);
+        }
+    }
+
+
+
+
+    public function updateGroupName(Request $request, GroupsRoles $groupsRoles, Groups $groups)
+    {
+
+        $group_id = $request->group_id;
+        // $current_assigned_roles_to_group = $this->groups->find($group_id)->GroupRoles()->get(); //Array
+        //$current_assigned_count = $this->groups->find($group_id)->GroupRoles()->get()->count(); //int
+
+        $group_names = Groups::findorfail($group_id);
+        $response_messages['success'] = "";
+
+        //Validation
+        //'|unique:groups,name'
+        if (strtolower($group_names->name) != strtolower($request->name)) {
+            $validatedData = $request->validate([
+                'name' => 'required|unique:groups,name',
+
+            ]);
+        }
+
+
+        $query = $groups->findorfail($group_id);
+        //dd($query);
+        if ($query) {
+
+            $update_groups = $groups->where('id', $group_id)->update([
+                'name' => $request->name,
+                'updated_at' => now()
+            ]);
+            $response_messages['success'] = "Group name " . $group_names->name . " has been updated.";
+        } else {
+
+            $response_messages['error'] = "Error - GroupController group id: " . $group_id;
         }
         $roles_2 = Roles::orderby('name', 'ASC')->get();
         $this->setGroup_id($group_id);

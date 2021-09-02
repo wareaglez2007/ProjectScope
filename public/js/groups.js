@@ -2,6 +2,7 @@
  * These scripts are for Groups Mods
  */
 
+
 /**
  * 09-01-2021
  * DOM Ready Section Will go below
@@ -215,7 +216,118 @@ function UpdateRolesforGroupsSelect2(role_id, group_id) {
 
 }
 
+/**
+ *
+ * @param int group_id
+ * @controller updateGroupName
+ * @returns Blade view: GroupsManagement.partials.rolesgroupspagination
+ */
+function UpdateGroupName(group_id) {
+    var current_page = $("#roles_groups_current_page").val();
+    var group_name = $("#g_name").val();
+    //Submit form
+    $.ajaxSetup({
+        headers: {
+            'X-CSRF-TOKEN': $(
+                'meta[name="csrf-token"]')
+                .attr(
+                    'content')
+        }
+
+    }); //End of ajax setup
+    $.ajax({
+        url: '/admin/groups/show/'+group_id+'/updategroup?page=' + current_page,
+        method: "get",
+        //cache: false,
+        data: {
+            group_id: group_id,
+            name: group_name
+        },
+        success: function (data) {
+            var toastcolor = "";
+            var toast_message = "";
+            if (typeof data != 'undefined') {
+                var current_page = $("#roles_groups_current_page").val();
+                $('#group_roles_data').html(data.view); //<< !!Attention: it returns the select2 see function details at top!!
+
+                if (typeof data.response.error != 'undefined') {
+                    toastcolor = "#dc3545";
+                    toast_message = data.response.error;
+                } else {
+                    toastcolor = "#04AA6D";
+                    toast_message = data.response.success;
+                }
+                HandleAjaxResponsesToast(850, toastcolor, group_id, toast_message, 200);
+            }
+        }, //end of success
+        error: function (error) {
+            console.log(error);
+            if (typeof error.responseJSON.message != 'undefined') {
+                toastcolor = "#dc3545";
+                toast_message = error.responseJSON.message;
+
+                //HandleAjaxResponsesToast(1050, toastcolor, mess_count, toast_message, 422);
+
+                $.each(error.responseJSON.errors, function (index, val) {
+                    HandleAjaxResponsesToast(2300, toastcolor, index, val, error.status);
+
+                });
+            }
+
+        } //end of error
+    }); //end of ajax
+  }
 
 
+function CreateNewGroup(){
+   var group_name =  $("#group_name").val();
+     //Submit form
+     $.ajaxSetup({
+        headers: {
+            'X-CSRF-TOKEN': $(
+                'meta[name="csrf-token"]')
+                .attr(
+                    'content')
+        }
 
+    }); //End of ajax setup
+    $.ajax({
+        url: '/admin/groups/store',
+        method: "post",
+        //cache: false,
+        data: {
+            name: group_name
+        },
+        success: function (data) {
+            var toastcolor = "";
+            var toast_message = "";
+            if (typeof data != 'undefined') {
+                $('#create_group_div').html(data.view); //<< !!Attention: it returns the select2 see function details at top!!
 
+                if (typeof data.response.error != 'undefined') {
+                    toastcolor = "#dc3545";
+                    toast_message = data.response.error;
+                } else {
+                    toastcolor = "#04AA6D";
+                    toast_message = data.response.success;
+                }
+                HandleAjaxResponsesToast(1050, toastcolor, 1, toast_message, 200);
+            }
+        }, //end of success
+        error: function (error) {
+
+            if (typeof error.responseJSON.message != 'undefined') {
+                toastcolor = "#dc3545";
+                toast_message = error.responseJSON.message;
+
+                //HandleAjaxResponsesToast(1050, toastcolor, mess_count, toast_message, 422);
+
+                $.each(error.responseJSON.errors, function (index, val) {
+                    HandleAjaxResponsesToast(2300, toastcolor, index, val, error.status);
+
+                });
+            }
+
+        } //end of error
+    }); //end of ajax
+}

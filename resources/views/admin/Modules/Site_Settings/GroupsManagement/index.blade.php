@@ -37,9 +37,11 @@
                                 @include('admin.Modules.Site_Settings.GroupsManagement.partials.show')
                             @endif
                         </div>
-                        @if (request()->path() == 'admin/groups/create')
-                            @include('admin.Modules.Site_Settings.GroupsManagement.partials.create')
-                        @endif
+
+                            @if (request()->path() == 'admin/groups/create')
+                                @include('admin.Modules.Site_Settings.GroupsManagement.partials.create')
+                            @endif
+
 
                     </div>
                 </div>

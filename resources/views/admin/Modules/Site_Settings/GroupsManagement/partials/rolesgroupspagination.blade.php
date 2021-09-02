@@ -26,7 +26,7 @@
                    <td class="only-desktop">{{ $group->updated_at }}</td>
                    <td>
                        <button type="submit" class="btn btn-primary"
-                           onclick="event.preventDefault();UpdateGroupsRoles({{ $group->id }});">Update</button>
+                           onclick="event.preventDefault();UpdateGroupName({{ $group->id }});">Update Group Name</button>
                    </td>
                </tr>
            </tbody>

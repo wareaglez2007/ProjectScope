@@ -53,6 +53,8 @@ Route::middleware('auth')->prefix('admin')->group(function () {
     Route::get('groups/show/{id}/groupsrolespagination', [App\Http\Controllers\GroupsController::class, 'GroupsRolesAjaxPaginationdata']);
     //Select 2
     Route::get('groups/show/{id}/rolesupdate', [App\Http\Controllers\GroupsController::class, 'updatewithSelect2']);
+    //Group name update = '/admin/groups/show/'+group_id+'/updategroup
+    Route::get('groups/show/{id}/updategroup', [App\Http\Controllers\GroupsController::class, 'updateGroupName']);
     /**
      * Roles Controller
      */
