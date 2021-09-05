@@ -1,6 +1,5 @@
 <div id="groups-section">
 
-
     @if (is_countable($groups) && count($groups) > 0)
         <table class="table table-inverse table-hover">
             <thead class="thead-inverse">

@@ -1,3 +1,10 @@
+@section('head')
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+@endsection
+@section('styles')
+    <link href="{{ asset('css/roles.css') }}" rel="stylesheet">
+@endsection
 @extends('layouts.app')
 
 @section('content')
@@ -9,28 +16,45 @@
                 {{-- -ROW 1 --}}
                 <div class="row">
                     {{-- Manage Roles --}}
-                    <div class="col-md-3">
-                        <ul class="list-group ">
-                            <li class="list-group-item"><a href="">Create new role</a></li>
-                            <li class="list-group-item"><a href="">Edit roles</a></li>
-                            <li class="list-group-item"><a href="">Delete roles</a></li>
-                        </ul>
-                    </div>
+                    <table class="table table-bordered">
 
-                    {{-- Main Section to display content for this module --}}
-                    <div class="col-md-9">
-                        @if (request()->path() == 'admin/roles')
-                            @include('admin.Modules.Site_Settings.RolesManagement.partials.default')
+                        <tbody>
+                            <tr>
+                                <td scope="row"><a href="" class="btn btn-success btn-sm">Create New Role</a></td>
+                                <td><a href="" class="btn btn-warning btn-sm">See Permissions</a></td>
+                                <td><a href="{{ route('admin.roles') }}" class="btn btn-info btn-sm">See All Roles</a></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                {{-- Main Section to display content for this module --}}
+                <div class="row">
+                    <div class="col-md-12">
+                        @if (null !== $role_view)
+                            @switch($role_view)
+                                @case('index')
+                                   
+                                    <div>
+                                        @include('admin.Modules.Site_Settings.RolesManagement.partials.default')
+                                    </div>
+                                @break
+                                @case('show')
+                                    @include('admin.Modules.Site_Settings.RolesManagement.partials.show')
+                                @break
+                                @default
+                                    @include('admin.Modules.Site_Settings.RolesManagement.partials.default')
+                            @endswitch
+                        @else
+                            <p>There are no views available!</p>
                         @endif
-                        @if (isset($id))
-                            @include('admin.Modules.Site_Settings.GroupsManagement.partials.show')
-                        @endif
-                        @if (request()->path() == 'admin/groups/create')
-                            @include('admin.Modules.Site_Settings.GroupsManagement.partials.create')
-                        @endif
+
                     </div>
                 </div>
             </div>
         </div>
     </div>
+    </div>
+    {{-- DO NOT REMOVE THE javascript from here!!! --}}
+    <script src="{{ asset('js/roles.js') }}" defer></script>
 @endsection

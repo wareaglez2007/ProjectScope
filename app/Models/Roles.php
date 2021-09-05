@@ -4,10 +4,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-
+use Illuminate\Database\Eloquent\SoftDeletes;
 class Roles extends Model
 {
     use HasFactory;
+    use SoftDeletes;
 
     protected $roles = [
         'groups' =>
@@ -145,7 +146,11 @@ class Roles extends Model
 
         ]
     ];
-
+    protected $fillable = [
+        'name',
+        'deleted_at',
+        'updated_at'
+    ];
 
 
 

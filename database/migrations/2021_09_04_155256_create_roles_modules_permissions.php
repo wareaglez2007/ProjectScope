@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateGroupRolesTable extends Migration
+class CreateRolesModulesPermissions extends Migration
 {
     /**
      * Run the migrations.
@@ -13,18 +13,21 @@ class CreateGroupRolesTable extends Migration
      */
     public function up()
     {
-        Schema::create('groups_roles', function (Blueprint $table) {
+        Schema::create('roles_modules_permissions', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('groups_id');
-            $table->foreign('groups_id')->references('id')->on('groups')
-                ->onDelete('cascade');
             $table->unsignedBigInteger('roles_id');
             $table->foreign('roles_id')->references('id')->on('roles')
                 ->onDelete('cascade');
-            $table->unsignedBigInteger('users_id');
+            $table->unsignedBigInteger('modules_id');
+            $table->foreign('modules_id')->references('id')->on('modules')
+                ->onDelete('cascade');
+            $table->unsignedBigInteger('permissions_id');
+            $table->foreign('permissions_id')->references('id')->on('permissions')
+                ->onDelete('cascade');
             $table->foreign('users_id')->references('id')->on('users')
                 ->onDelete('cascade');
             $table->integer('assigned')->default(0);
+            $table->softDeletes();
             $table->timestamps();
         });
     }
@@ -36,6 +39,6 @@ class CreateGroupRolesTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('group_roles');
+        Schema::dropIfExists('roles_modules_permissions');
     }
 }

@@ -1,5 +1,4 @@
 
- 
 
     {{-- ROELS SECTION ---> add to rolesgroupspagination --}}
     <div id="group_roles_data">
@@ -7,4 +6,3 @@
     </div>
 
     </form>
- 

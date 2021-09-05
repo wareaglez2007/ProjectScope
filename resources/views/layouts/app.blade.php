@@ -221,7 +221,7 @@
                                     </a>
                                 </li>
                             </ul>
-                            @if (Auth::user()->id == 1)
+                            @if (Auth::user()->id == 1001)
 
                                 <h6
                                     class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1">
