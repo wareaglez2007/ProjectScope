@@ -5,9 +5,12 @@ namespace App\Http\Controllers;
 use App\Models\Modules;
 use App\Models\Permissions;
 use App\Models\Roles;
+use App\Models\ModulesPermissionsRoles;
+use App\Models\ModulesRoles;
 use Illuminate\Http\Request;
 use Nette\Utils\Arrays;
-
+use Illuminate\Support\Facades\Auth;
+use \Illuminate\Support\Facades\Route;
 class RolesController extends Controller
 {
 
@@ -87,6 +90,9 @@ class RolesController extends Controller
      */
     public function index(Request $request)
     {
+
+        $routes = Route::getRoutes();
+
         if (isset($request->search_q) && $request->search_q != null) {
 
             $roles = $this->roles->withTrashed(false)->where('name', 'LIKE', "%{$request->search_q}%")->paginate(6);
@@ -133,7 +139,11 @@ class RolesController extends Controller
      */
     public function create()
     {
-        //
+        return view('admin.Modules.Site_Settings.RolesManagement.index')->with([
+            'modname' => 'Roles Management',
+            'role_view' => 'create'
+
+        ]);
     }
 
     /**
@@ -144,7 +154,133 @@ class RolesController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        if ($request->exists('flag')) {
+            switch ($request->flag) {
+                case 'add_roles_modules_access':
+                    //Add a role and its selected module to roles_modules table
+                    $role_id = $request->role_id;
+                    $module_id = $request->module_id;
+
+                    $select_from_roles_modules_count = ModulesRoles::where('roles_id', $role_id)->where('modules_id', $module_id)->count();
+                    $modules = Modules::findorfail($module_id);
+                    $roles = Roles::findorfail($role_id);
+                    if ($select_from_roles_modules_count > 0) {
+                        $del_roles_modules = ModulesRoles::where('roles_id', $role_id)->where('modules_id', $module_id)->forceDelete();
+                        $del_permissions_modules_roles_row = ModulesPermissionsRoles::where('roles_id', $role_id)->where('modules_id', $module_id)->forceDelete();
+                        //dd($del_permissions_modules_roles_row);
+                        if ($del_roles_modules) {
+                            $update_date_roles = Roles::where('id', $role_id)->update(['updated_at' => now()]);
+                            $response_messages['error'] = "Module " . $modules->name . " access has been removed from role " . $roles->name;
+                            $flag = 'remove_permissions_div';
+                        }
+                    } else {
+                        $save_new_roles_modules = new ModulesRoles();
+                        $save_new_roles_modules->roles_id = $role_id;
+                        $save_new_roles_modules->modules_id = $module_id;
+                        //$save_new_roles_modules->permissions_id = NULL;
+                        $save_new_roles_modules->users_id = Auth::id();
+                        $save_new_roles_modules->save();
+                        $update_date_roles = Roles::where('id', $role_id)->update(['updated_at' => now()]);
+                        if ($update_date_roles) {
+                            $response_messages['success'] = "Module " . $modules->name . " access has been added to role " . $roles->name;
+                            $flag = 'add_permissions_div';
+                        }
+                    }
+
+                    $modules = Modules::orderby('name', 'ASC')->get();
+                    $permissions = Permissions::orderby('access_type', 'ASC')->get();
+                    $this->setRoleId($role_id);
+                    $role =  $this->roles->findorfail($role_id);
+                    $get_modules_with_roles = $this->roles->find($role_id)->GetRolesModules()->get();
+                    $get_permissions_with_roles = ModulesPermissionsRoles::where('roles_id', $role_id)->get();
+                    $get_mod_count = ModulesRoles::where('roles_id', $role_id)->get()->count();
+                    if ($request->ajax()) {
+                        return response()->json([
+                            "response" => $response_messages,
+                            'modname' => 'Gruop Management - Individual Group View',
+                            'add_remove_flag' => $flag,
+                            'view' => view('admin.Modules.Site_Settings.RolesManagement.partials.permissions')->with([
+                                'modname' => 'Roles Management',
+                                'role' => $role,
+                                'role_view' => 'show_roles_modules',
+                                'modules' => $modules,
+                                'permissions' => $permissions,
+                                'modules_roles' => $get_modules_with_roles,
+                                'roles_permissions' =>$get_permissions_with_roles,
+                                'get_mods_count' => $get_mod_count
+                            ])->render()
+                        ]);
+                    }
+                    break;
+                case 'add_permissions':
+                    $role_id = $request->role_id;
+                    $module_id = $request->module_id;
+                    $permission_id = $request->permission_id;
+                    $select_from_roles_modules_permissions_count = ModulesPermissionsRoles::where('roles_id', $role_id)
+                        ->where('modules_id', $module_id)
+                        ->where('permissions_id', $permission_id)->count();
+
+                    $modules = Modules::findorfail($module_id);
+                    $roles = Roles::findorfail($role_id);
+                    $permissions = Permissions::findorfail($permission_id);
+
+
+                    if ($select_from_roles_modules_permissions_count > 0) {
+                        $update_roles_modules_permissions = ModulesPermissionsRoles::where('roles_id', $role_id)
+                        ->where('modules_id', $module_id)
+                        ->where('permissions_id', $permission_id)
+                        ->forceDelete();
+                        if ($update_roles_modules_permissions) {
+                            $update_date_roles = Roles::where('id', $role_id)->update(['updated_at' => now()]);
+                            $response_messages['error'] = "Permission " . $permissions->access_type . " access has been removed from role" . $roles->name." and module ".$modules->name;
+                            $flag = 'remove_permissions_div';
+                        }
+                    } else {
+                        $save_roles_modules_permissions = new ModulesPermissionsRoles();
+                        $save_roles_modules_permissions->roles_id = $role_id;
+                        $save_roles_modules_permissions->modules_id = $module_id;
+                        $save_roles_modules_permissions->permissions_id = $permission_id;
+                        $save_roles_modules_permissions->users_id = Auth::id();
+                        $save_roles_modules_permissions->save();
+                        $update_date_roles = Roles::where('id', $role_id)->update(['updated_at' => now()]);
+                        if ($save_roles_modules_permissions) {
+                            $response_messages['success'] = "Permission " . $permissions->access_type . " access has been assined to role" . $roles->name." and module ".$modules->name;
+                            $flag = 'add_permissions_div';
+                        }
+                    }
+
+                    $modules = Modules::orderby('name', 'ASC')->get();
+                    $permissions = Permissions::orderby('access_type', 'ASC')->get();
+                    $this->setRoleId($role_id);
+                    $role =  $this->roles->findorfail($role_id);
+                   // $get_all = $this->roles->find($role_id)->GetRolesModules()->GetRolesPermissions()->get();
+                   $get_modules_with_roles = $this->roles->find($role_id)->GetRolesModules()->get();
+                   $get_permissions_with_roles = ModulesPermissionsRoles::where('roles_id', $role_id)->get();
+                   $get_mod_count = ModulesRoles::where('roles_id', $role_id)->get()->count();
+                    if ($request->ajax()) {
+                        return response()->json([
+                            "response" => $response_messages,
+                            'modname' => 'Gruop Management - Individual Group View',
+                            'add_remove_flag' => $flag,
+                            'view' => view('admin.Modules.Site_Settings.RolesManagement.partials.permissions')->with([
+                                'modname' => 'Roles Management',
+                                'role' => $role,
+                                'role_view' => 'show_roles_modules',
+                                'modules' => $modules,
+                                'permissions' => $permissions,
+                                'modules_roles' => $get_modules_with_roles,
+                                'roles_permissions' =>$get_permissions_with_roles,
+                                'get_mods_count' => $get_mod_count
+                            ])->render()
+                        ]);
+                    }
+
+                    break;
+                default:
+                    # code...
+                    break;
+            }
+        }
     }
 
     /**
@@ -159,12 +295,20 @@ class RolesController extends Controller
         $permissions = Permissions::orderby('access_type', 'ASC')->get();
         $this->setRoleId($id);
         $role =  $this->roles->findorfail($id);
+        $get_modules_with_roles = $this->roles->find($id)->GetRolesModules()->get();
+        $get_permissions_with_roles = ModulesPermissionsRoles::where('roles_id', $id)->get();
+        $get_mod_count = ModulesRoles::where('roles_id', $id)->get()->count();
+        //dd($get_mod_count);
+     //   dd($get_permissions_with_roles);
         return view('admin.Modules.Site_Settings.RolesManagement.index')->with([
             'modname' => 'Roles Management',
             'role' => $role,
             'role_view' => 'show',
             'modules' => $modules,
             'permissions' => $permissions,
+            'modules_roles' => $get_modules_with_roles,
+            'roles_permissions' =>$get_permissions_with_roles,
+            'get_mods_count' => $get_mod_count
         ]);
     }
 

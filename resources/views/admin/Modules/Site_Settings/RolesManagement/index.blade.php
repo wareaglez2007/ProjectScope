@@ -34,13 +34,15 @@
                         @if (null !== $role_view)
                             @switch($role_view)
                                 @case('index')
-                                   
                                     <div>
                                         @include('admin.Modules.Site_Settings.RolesManagement.partials.default')
                                     </div>
                                 @break
                                 @case('show')
                                     @include('admin.Modules.Site_Settings.RolesManagement.partials.show')
+                                @break
+                                @case('create')
+                                    @include('admin.Modules.Site_Settings.RolesManagement.partials.create')
                                 @break
                                 @default
                                     @include('admin.Modules.Site_Settings.RolesManagement.partials.default')

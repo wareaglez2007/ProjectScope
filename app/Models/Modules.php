@@ -26,4 +26,16 @@ class Modules extends Model
         12 => 'FrontendController'
     ];
 
+
+    public function GetModulesRoles()
+    {
+        return $this->belongsToMany(Roles::class);
+    }
+
+    public function GetModulesPermissions()
+    {
+        return $this->belongsToMany(Permissions::class, ModulesPermissionsRoles::class);
+    }
+
+
 }
