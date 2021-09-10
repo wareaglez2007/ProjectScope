@@ -1,6 +1,6 @@
 <div>
     @if (is_countable($roles) && count($roles) > 0)
-        <table class="table table-bordere table-hover">
+        <table class="table table-bordered table-hover">
             <thead class="thead-inverse">
                 <tr>
                     <th>Role Id</th>

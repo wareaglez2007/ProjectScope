@@ -26,30 +26,35 @@ class UsersController extends Controller
 
         if (isset($request->search_q) && $request->search_q != null) {
 
-            $users = User::withTrashed(false)->where('name', 'LIKE', "%{$request->search_q}%")->orderby('name', 'ASC')->paginate(10);
-
+            $users = User::where('name', 'LIKE', "%{$request->search_q}%")->orwhere('email', 'LIKE', "%{$request->search_q}%")->orderby('name', 'ASC')->paginate(10);
+            $count = User::where('name', 'LIKE', "%{$request->search_q}%")->orwhere('email', 'LIKE', "%{$request->search_q}%")->count();
             if ($request->ajax()) {
                 return response()->json([
                     'modname' => 'Users Management',
-                    'view' => view('admin.Modules.Site_Settings.UserManagement.index')->with([
+                    'view' => view('admin.Modules.Site_Settings.UserManagement.partials.showusers')->with([
                         'modname' => 'Users Management',
                         'user_view' => 'index',
                         'current_page' => $users->currentPage(),
-                        'users' => $users
+                        'users' => $users,
+                        'search_q' => $request->search_q,
+                        'search_count' => $count
                     ])->render()
                 ]);
             }
         } else {
-
+            $request->search_q = "";
             $users =  User::orderBy('name', 'ASC')->paginate(10);
+            $count = User::count();
             if ($request->ajax()) {
                 return response()->json([
                     'modname' => 'Users Management',
-                    'view' => view('admin.Modules.Site_Settings.UserManagement.index')->with([
+                    'view' => view('admin.Modules.Site_Settings.UserManagement.partials.showusers')->with([
                         'modname' => 'Users Management',
                         'user_view' => 'index',
                         'current_page' => $users->currentPage(),
-                        'users' => $users
+                        'users' => $users,
+                        'search_q' => $request->search_q,
+                        'search_count' => $count
                     ])->render()
                 ]);
             } else {
@@ -57,7 +62,9 @@ class UsersController extends Controller
                     'modname' => 'Users Management',
                     'user_view' => 'index',
                     'current_page' => $users->currentPage(),
-                    'users' => $users
+                    'users' => $users,
+                    'search_q' => $request->search_q,
+                    'search_count' => $count
                 ]);
             }
         }

@@ -58,5 +58,5 @@
     </div>
     </div>
     {{-- DO NOT REMOVE THE javascript from here!!! --}}
-    <script src="{{ asset('js/roles.js') }}" defer></script>
+    <script src="{{ asset('js/users.js') }}" defer></script>
 @endsection
