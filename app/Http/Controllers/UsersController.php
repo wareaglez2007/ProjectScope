@@ -26,8 +26,15 @@ class UsersController extends Controller
 
         if (isset($request->search_q) && $request->search_q != null) {
 
-            $users = User::where('name', 'LIKE', "%{$request->search_q}%")->orwhere('email', 'LIKE', "%{$request->search_q}%")->orderby('name', 'ASC')->paginate(10);
-            $count = User::where('name', 'LIKE', "%{$request->search_q}%")->orwhere('email', 'LIKE', "%{$request->search_q}%")->count();
+            $users = User::where('name', 'LIKE', "%{$request->search_q}%")
+            ->orwhere('email', 'LIKE', "%{$request->search_q}%")
+            ->orwhere('roles_id', 'LIKE', "%{$request->search_q}%")
+            ->orderby('name', 'ASC')->paginate(10);
+            $count = User::where('name', 'LIKE', "%{$request->search_q}%")
+            ->orwhere('email', 'LIKE', "%{$request->search_q}%")
+            ->orwhere('roles_id', 'LIKE', "%{$request->search_q}%")
+            ->count();
+
             if ($request->ajax()) {
                 return response()->json([
                     'modname' => 'Users Management',
