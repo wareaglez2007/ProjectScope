@@ -11,6 +11,7 @@ use Illuminate\Http\Request;
 use Nette\Utils\Arrays;
 use Illuminate\Support\Facades\Auth;
 use \Illuminate\Support\Facades\Route;
+
 class RolesController extends Controller
 {
 
@@ -92,10 +93,12 @@ class RolesController extends Controller
     {
 
         $routes = Route::getRoutes();
+        $group_info = $this->roles->with('GetGroups')->get();
+
 
         if (isset($request->search_q) && $request->search_q != null) {
 
-            $roles = $this->roles->withTrashed(false)->where('name', 'LIKE', "%{$request->search_q}%")->paginate(6);
+            $roles = $this->roles->withTrashed(false)->where('name', 'LIKE', "%{$request->search_q}%")->orderby('name', 'ASC')->paginate(6);
 
             if ($request->ajax()) {
                 return response()->json([
@@ -104,13 +107,14 @@ class RolesController extends Controller
                         'modname' => 'Roles Management',
                         'roles' => $roles,
                         'role_view' => 'index',
-                        'current_page' => $roles->currentPage()
+                        'current_page' => $roles->currentPage(),
+                        'group_info' => $group_info
                     ])->render()
                 ]);
             }
         } else {
 
-            $roles =  $this->getRoles()->orderBy('id', 'ASC')->paginate(6);
+            $roles =  $this->getRoles()->orderBy('name', 'ASC')->paginate(6);
             if ($request->ajax()) {
                 return response()->json([
                     'modname' => 'Roles Management',
@@ -118,7 +122,8 @@ class RolesController extends Controller
                         'modname' => 'Roles Management',
                         'roles' => $roles,
                         'role_view' => 'index',
-                        'current_page' => $roles->currentPage()
+                        'current_page' => $roles->currentPage(),
+                        'group_info' => $group_info
                     ])->render()
                 ]);
             } else {
@@ -126,7 +131,8 @@ class RolesController extends Controller
                     'modname' => 'Roles Management',
                     'roles' => $roles,
                     'role_view' => 'index',
-                    'current_page' => $roles->currentPage()
+                    'current_page' => $roles->currentPage(),
+                    'group_info' => $group_info
                 ]);
             }
         }
@@ -194,6 +200,7 @@ class RolesController extends Controller
                     $get_modules_with_roles = $this->roles->find($role_id)->GetRolesModules()->get();
                     $get_permissions_with_roles = ModulesPermissionsRoles::where('roles_id', $role_id)->get();
                     $get_mod_count = ModulesRoles::where('roles_id', $role_id)->get()->count();
+                    $group_info = $this->roles->findorfail($role_id)->GetGroups()->get();
                     if ($request->ajax()) {
                         return response()->json([
                             "response" => $response_messages,
@@ -206,8 +213,9 @@ class RolesController extends Controller
                                 'modules' => $modules,
                                 'permissions' => $permissions,
                                 'modules_roles' => $get_modules_with_roles,
-                                'roles_permissions' =>$get_permissions_with_roles,
-                                'get_mods_count' => $get_mod_count
+                                'roles_permissions' => $get_permissions_with_roles,
+                                'get_mods_count' => $get_mod_count,
+                                'group_info' => $group_info
                             ])->render()
                         ]);
                     }
@@ -227,12 +235,12 @@ class RolesController extends Controller
 
                     if ($select_from_roles_modules_permissions_count > 0) {
                         $update_roles_modules_permissions = ModulesPermissionsRoles::where('roles_id', $role_id)
-                        ->where('modules_id', $module_id)
-                        ->where('permissions_id', $permission_id)
-                        ->forceDelete();
+                            ->where('modules_id', $module_id)
+                            ->where('permissions_id', $permission_id)
+                            ->forceDelete();
                         if ($update_roles_modules_permissions) {
                             $update_date_roles = Roles::where('id', $role_id)->update(['updated_at' => now()]);
-                            $response_messages['error'] = "Permission " . $permissions->access_type . " access has been removed from role" . $roles->name." and module ".$modules->name;
+                            $response_messages['error'] = "Permission " . $permissions->access_type . " access has been removed from role" . $roles->name . " and module " . $modules->name;
                             $flag = 'remove_permissions_div';
                         }
                     } else {
@@ -244,7 +252,7 @@ class RolesController extends Controller
                         $save_roles_modules_permissions->save();
                         $update_date_roles = Roles::where('id', $role_id)->update(['updated_at' => now()]);
                         if ($save_roles_modules_permissions) {
-                            $response_messages['success'] = "Permission " . $permissions->access_type . " access has been assined to role" . $roles->name." and module ".$modules->name;
+                            $response_messages['success'] = "Permission " . $permissions->access_type . " access has been assined to role" . $roles->name . " and module " . $modules->name;
                             $flag = 'add_permissions_div';
                         }
                     }
@@ -253,10 +261,11 @@ class RolesController extends Controller
                     $permissions = Permissions::orderby('access_type', 'ASC')->get();
                     $this->setRoleId($role_id);
                     $role =  $this->roles->findorfail($role_id);
-                   // $get_all = $this->roles->find($role_id)->GetRolesModules()->GetRolesPermissions()->get();
-                   $get_modules_with_roles = $this->roles->find($role_id)->GetRolesModules()->get();
-                   $get_permissions_with_roles = ModulesPermissionsRoles::where('roles_id', $role_id)->get();
-                   $get_mod_count = ModulesRoles::where('roles_id', $role_id)->get()->count();
+                    // $get_all = $this->roles->find($role_id)->GetRolesModules()->GetRolesPermissions()->get();
+                    $get_modules_with_roles = $this->roles->find($role_id)->GetRolesModules()->get();
+                    $get_permissions_with_roles = ModulesPermissionsRoles::where('roles_id', $role_id)->get();
+                    $get_mod_count = ModulesRoles::where('roles_id', $role_id)->get()->count();
+                    $group_info = $this->roles->findorfail($role_id)->GetGroups()->get();
                     if ($request->ajax()) {
                         return response()->json([
                             "response" => $response_messages,
@@ -269,8 +278,9 @@ class RolesController extends Controller
                                 'modules' => $modules,
                                 'permissions' => $permissions,
                                 'modules_roles' => $get_modules_with_roles,
-                                'roles_permissions' =>$get_permissions_with_roles,
-                                'get_mods_count' => $get_mod_count
+                                'roles_permissions' => $get_permissions_with_roles,
+                                'get_mods_count' => $get_mod_count,
+                                'group_info' => $group_info
                             ])->render()
                         ]);
                     }
@@ -298,8 +308,10 @@ class RolesController extends Controller
         $get_modules_with_roles = $this->roles->find($id)->GetRolesModules()->get();
         $get_permissions_with_roles = ModulesPermissionsRoles::where('roles_id', $id)->get();
         $get_mod_count = ModulesRoles::where('roles_id', $id)->get()->count();
+        $group_info = $this->roles->findorfail($id)->GetGroups()->get();
+        // dd($group_info);
         //dd($get_mod_count);
-     //   dd($get_permissions_with_roles);
+        //   dd($get_permissions_with_roles);
         return view('admin.Modules.Site_Settings.RolesManagement.index')->with([
             'modname' => 'Roles Management',
             'role' => $role,
@@ -307,8 +319,9 @@ class RolesController extends Controller
             'modules' => $modules,
             'permissions' => $permissions,
             'modules_roles' => $get_modules_with_roles,
-            'roles_permissions' =>$get_permissions_with_roles,
-            'get_mods_count' => $get_mod_count
+            'roles_permissions' => $get_permissions_with_roles,
+            'get_mods_count' => $get_mod_count,
+            'group_info' => $group_info
         ]);
     }
 

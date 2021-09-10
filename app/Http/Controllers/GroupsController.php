@@ -168,6 +168,7 @@ class GroupsController extends Controller
             $save_new_roles->groups_id = $group_id;
             $save_new_roles->roles_id = $selected_roles;
             $save_new_roles->users_id = Auth::id();
+            $save_new_roles->assigned = 1;
             $save_new_roles->save();
             $update_date_groups = $groups->where('id', $group_id)->update(['updated_at' => now()]);
             $response_messages['success'] = "Role " . $role_names->name . " has been added to " . $group_names->name;
@@ -437,6 +438,7 @@ class GroupsController extends Controller
             $save_new_roles->groups_id = $group_id;
             $save_new_roles->roles_id = $selected_roles;
             $save_new_roles->users_id = Auth::id();
+            $save_new_roles->assigned = 1;
             $save_new_roles->save();
             $update_date_groups = $groups->where('id', $group_id)->update(['updated_at' => now()]);
             $response_messages['success'] = "Role " . $role_names->name . " has been added to " . $group_names->name;

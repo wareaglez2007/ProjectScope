@@ -76,8 +76,8 @@
                                        <span class="slider round"></span>
                                    </label>
                                </td>
-                               <td scope="row">{{ $role->id }}</td>
-                               <td>{{ $role->name }}</td>
+                               <td scope="row"><a href="{{ route('admin.roles.show' ,['id' => $role->id]) }}" class="btn btn-link">{{ $role->id }}</a></td>
+                               <td><a href="{{ route('admin.roles.show' ,['id' => $role->id]) }}" class="btn btn-link">{{ $role->name }}</a></td>
 
                            </tr>
 

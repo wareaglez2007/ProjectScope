@@ -18,7 +18,6 @@ $(function () {
 
 
 
-
 }); //END of DOM ON READY <<-------------------
 
 

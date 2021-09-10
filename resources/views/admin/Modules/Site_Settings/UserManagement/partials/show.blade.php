@@ -1,15 +1,12 @@
 {{-- @if ($role_view == 'show_roles_modules') --}}
-@if (is_countable($modules_roles) && count($modules_roles))
-
-
-
-
+@if (is_countable($user_roles) && count($user_roles))
 
     <form action="">
         <input type="hidden" value="{{ $get_mods_count }}" id="mods_count" />
         <table class="table table-bordered table-inverse">
             <thead class="thead-inverse">
                 <tr>
+                    <th>User</th>
                     <th>Group(s) Belongs to</th>
                     <th>Role</th>
                     <th>Module Assignment</th>
@@ -20,7 +17,7 @@
                 @php
                     $i = 0;
                 @endphp
-                @foreach ($modules_roles as $assigned_mods)
+                @foreach ($user_roles as $assigned_mods)
                     @php
                         $i++;
                     @endphp

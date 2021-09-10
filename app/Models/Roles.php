@@ -24,6 +24,9 @@ class Roles extends Model
         return $this->belongsToMany(Modules::class);
     }
 
+    public function GetGroups(){
+        return $this->belongsToMany(Groups::class);
+    }
 
 
     //  /**

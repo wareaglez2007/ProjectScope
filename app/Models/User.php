@@ -20,6 +20,9 @@ class User extends Authenticatable
     protected $fillable = [
         'name',
         'email',
+        'roles_id',
+        'assigned',
+        'uuid',
         'password',
     ];
 
@@ -41,4 +44,24 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+
+    /**
+     * Return Role ID and Info Associated with User
+     */
+    public function userRole()
+    {
+        return $this->belongsto(Roles::class, 'roles_id', 'id');
+    }
+
+    public function GetAllRolesModsPerms()
+    {
+
+        return $this->belongsToMany(ModulesPermissionsRoles::class, GroupsRoles::class,'roles_id', 'roles_id', 'roles_id', 'roles_id');
+    }
+
+
+    public function userGroups()
+    {
+        return $this->belongsTo(GroupsRoles::class, 'roles_id', 'roles_id');
+    }
 }

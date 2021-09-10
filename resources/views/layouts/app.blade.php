@@ -12,8 +12,9 @@
 
     <!-- Scripts -->
     <script src="{{ asset('js/app.js') }}" defer></script>
-    <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.3/jquery-ui.min.js" defer></script>
-    <script src="{{ asset('js/dashboard.js') }}" defer></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>{{-- upgraded to 1.12 --}}
+    {{-- <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.3/jquery-ui.min.js" defer></script> --}}
+    <script src="{{ asset('js/dashboard.js') }}"></script>
     @yield('head')
     <!-- Fonts -->
     <link rel="dns-prefetch" href="//fonts.gstatic.com">
@@ -237,6 +238,7 @@
                                         $active2 = '';
                                         $active3 = '';
                                         $active4 = '';
+                                        $active5 = '';
 
                                         if (Request::segment(1) == 'admin') {
                                             if (Request::segment(2) == 'groups') {
@@ -247,6 +249,8 @@
                                                 $active3 = 'active';
                                             } elseif (Request::segment(2) == 'modules') {
                                                 $active4 = 'active';
+                                            } elseif (Request::segment(2) == 'users') {
+                                                $active5 = 'active';
                                             }
                                         }
 
@@ -275,6 +279,10 @@
                                                     class="list-group-item nav-link {{ $active4 }}"><i
                                                         class="bi bi-hdd-stack"></i>&nbsp;
                                                     Module Access</a>
+                                                <a href="{{ route('admin.users') }}"
+                                                    class="list-group-item nav-link {{ $active5 }}"><i
+                                                        class="bi bi-person-badge"></i>&nbsp;
+                                                    Users Management</a>
 
                                             </div>
                                         </div>

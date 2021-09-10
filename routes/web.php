@@ -82,6 +82,13 @@ Route::middleware('auth')->prefix('admin')->group(function () {
     Route::get('modules', [App\Http\Controllers\ModulesController::class, 'index'])->name('admin.modules');
     Route::get('modules/create', [App\Http\Controllers\ModulesController::class, 'create'])->name('admin.modules.create');
     Route::get('modules/update', [App\Http\Controllers\ModulesController::class, 'update'])->name('admin.modules.update');
+
+    /**
+     * Users Management & Assignments (roles/permissions)
+     */
+    Route::get('users', [App\Http\Controllers\UsersController::class, 'index'])->name('admin.users');
+    Route::get('users/create', [App\Http\Controllers\UsersController::class, 'create'])->name('admin.users.create');
+    Route::get('users/show/{id}', [App\Http\Controllers\UsersController::class, 'show'])->name('admin.users.show');
 });
 
 Route::middleware('auth')->prefix('users')->group(function () {

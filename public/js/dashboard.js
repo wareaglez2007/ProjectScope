@@ -8,7 +8,7 @@
  * @param {*} CSR_ER (defalut false)
  * @returns
  */
- function HandleAjaxResponsesToast(delay_time, div_color, uid, message, status_code, CSR_ER = false, tclass = null) {
+function HandleAjaxResponsesToast(delay_time, div_color, uid, message, status_code, CSR_ER = false, tclass = null) {
 
 
     var delay = delay_time;
@@ -56,3 +56,7 @@
     return toast;
 }
 
+/** Bootstrap popover 09-08-2021 */
+$(function () {
+    $('[data-toggle="tooltip"]').tooltip()
+})
