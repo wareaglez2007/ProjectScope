@@ -7,13 +7,22 @@
         <table class="table table-bordered table-striped table-hover">
             <thead>
                 <tr>
-                    <th>User Id</th>
-                    <th>Name</th>
-                    <th>Email</th>
-                    <th>Role Id</th>
-                    <th>Created At</th>
+                    {{-- ('bi bi-sort-numeric-up-alt', 'bi bi-sort-numeric-down'); --}}
+                    {{-- sortListsBy(selector, by, direction, icon_name, switch_icon) --}}
+                    <th><a class="text-muted" id="sort-by_id_asc" onclick="sortListsBy('sort-by_id_asc', 'id', 'desc', 'bi bi-sort-numeric-down', 'bi bi-sort-numeric-up-alt' );">Id&nbsp;<i class="bi bi-sort-numeric-down h5"></i></a>
+                    </th>
+                    <th><a class="text-muted" id="sort-by_name_asc">Name&nbsp;<i
+                                class="bi bi-sort-alpha-down h5"></i></a></th>
+                    <th><a class="text-muted" id="sort-by_email_asc">Email&nbsp;<i
+                                class="bi bi-sort-alpha-down h5"></i></a></th>
+                    <th><a class="text-muted" id="sort-by_role_asc">Role Id&nbsp;<i
+                                class="bi bi-sort-alpha-down h5"></i></a></th>
+                    <th><a class="text-muted" id="sort-by_cd_asc">Created At&nbsp;<i
+                                class="bi bi-sort-numeric-down h5"></i></a></th>
                 </tr>
+                <input type="hidden" id="current_page_num" value="{{ $users->currentPage() }}"/>
             </thead>
+
             <tbody>
                 @foreach ($users as $user)
                     <tr>
