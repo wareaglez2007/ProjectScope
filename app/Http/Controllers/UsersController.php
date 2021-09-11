@@ -26,14 +26,17 @@ class UsersController extends Controller
 
         if (isset($request->search_q) && $request->search_q != null) {
 
+            /** Number to show per page */
+
             $users = User::where('name', 'LIKE', "%{$request->search_q}%")
-            ->orwhere('email', 'LIKE', "%{$request->search_q}%")
-            ->orwhere('roles_id', 'LIKE', "%{$request->search_q}%")
-            ->orderby('name', 'ASC')->paginate(10);
+                ->orwhere('email', 'LIKE', "%{$request->search_q}%")
+                ->orwhere('roles_id', 'LIKE', "%{$request->search_q}%")
+                ->orderby('id', 'ASC')->paginate(10);
             $count = User::where('name', 'LIKE', "%{$request->search_q}%")
-            ->orwhere('email', 'LIKE', "%{$request->search_q}%")
-            ->orwhere('roles_id', 'LIKE', "%{$request->search_q}%")
-            ->count();
+                ->orwhere('email', 'LIKE', "%{$request->search_q}%")
+                ->orwhere('roles_id', 'LIKE', "%{$request->search_q}%")
+                ->count();
+            $start_end = $this->ShowStartEndPagination($users, $count);
 
             if ($request->ajax()) {
                 return response()->json([
@@ -44,14 +47,16 @@ class UsersController extends Controller
                         'current_page' => $users->currentPage(),
                         'users' => $users,
                         'search_q' => $request->search_q,
-                        'search_count' => $count
+                        'search_count' => $count,
+                        'start_end' => $start_end
                     ])->render()
                 ]);
             }
         } else {
             $request->search_q = "";
-            $users =  User::orderBy('name', 'ASC')->paginate(10);
+            $users =  User::orderBy('id', 'ASC')->paginate(10);
             $count = User::count();
+            $start_end = $this->ShowStartEndPagination($users, $count);
             if ($request->ajax()) {
                 return response()->json([
                     'modname' => 'Users Management',
@@ -61,7 +66,8 @@ class UsersController extends Controller
                         'current_page' => $users->currentPage(),
                         'users' => $users,
                         'search_q' => $request->search_q,
-                        'search_count' => $count
+                        'search_count' => $count,
+                        'start_end' => $start_end
                     ])->render()
                 ]);
             } else {
@@ -71,7 +77,8 @@ class UsersController extends Controller
                     'current_page' => $users->currentPage(),
                     'users' => $users,
                     'search_q' => $request->search_q,
-                    'search_count' => $count
+                    'search_count' => $count,
+                    'start_end' => $start_end
                 ]);
             }
         }
@@ -122,8 +129,6 @@ class UsersController extends Controller
             'modname' => 'Users Management - Individual view',
             'user_view' => 'show',
         ]);
-
-
     }
 
     /**
@@ -158,5 +163,31 @@ class UsersController extends Controller
     public function destroy($id)
     {
         //
+    }
+
+    /**
+     * @param User::class object $users
+     * @param User::class int $count
+     * @return string $start_end
+     */
+
+    public function ShowStartEndPagination($users, $count)
+    {
+        if ($users->hasMorePages() && $users->currentPage() == 1) {
+            //There are more pages
+            $users_count_start = 1;
+            $users_count_end = $users->perPage();
+        } elseif ($users->count() < $users->perPage()) {
+            //the end
+            $users_count_end = $users->total();
+            $users_count_start = $users_count_end - $users->count() + 1;
+        } else {
+            $users_count_end = $users->count() * $users->currentPage();
+            $users_count_start = ($users_count_end - $users->count()) + 1;
+        }
+        $start_end =  "<p>Showing <b> $users_count_start </b> to
+                    <b>$users_count_end</b> of <b><u>$count</u></b> entries.
+                </p>";
+         return $start_end;
     }
 }
