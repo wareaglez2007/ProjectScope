@@ -68,6 +68,7 @@ Route::middleware('auth')->prefix('admin')->group(function () {
     Route::get('roles/create', [App\Http\Controllers\RolesController::class, 'create'])->name('admin.roles.create');
     Route::get('roles/update/{id}', [App\Http\Controllers\RolesController::class, 'update'])->name('admin.roles.update');
     Route::get('roles/show/{id}', [App\Http\Controllers\RolesController::class, 'show'])->name('admin.roles.show');
+    Route::get('roles/edit/{id}', [App\Http\Controllers\RolesController::class, 'edit'])->name('admin.roles.edit');
     Route::get('roles/store', [App\Http\Controllers\RolesController::class, 'store'])->name('admin.roles.store');
 
     /**

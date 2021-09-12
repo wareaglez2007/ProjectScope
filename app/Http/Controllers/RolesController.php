@@ -94,48 +94,17 @@ class RolesController extends Controller
 
         $routes = Route::getRoutes();
         $group_info = $this->roles->with('GetGroups')->get();
+        $roles = Roles::all();
 
-
-        if (isset($request->search_q) && $request->search_q != null) {
-
-            $roles = $this->roles->withTrashed(false)->where('name', 'LIKE', "%{$request->search_q}%")->orderby('name', 'ASC')->paginate(6);
-
-            if ($request->ajax()) {
-                return response()->json([
-                    'modname' => 'Roles Management',
-                    'view' => view('admin.Modules.Site_Settings.RolesManagement.partials.showroles')->with([
-                        'modname' => 'Roles Management',
-                        'roles' => $roles,
-                        'role_view' => 'index',
-                        'current_page' => $roles->currentPage(),
-                        'group_info' => $group_info
-                    ])->render()
-                ]);
-            }
-        } else {
-
-            $roles =  $this->getRoles()->orderBy('name', 'ASC')->paginate(6);
-            if ($request->ajax()) {
-                return response()->json([
-                    'modname' => 'Roles Management',
-                    'view' => view('admin.Modules.Site_Settings.RolesManagement.partials.showroles')->with([
-                        'modname' => 'Roles Management',
-                        'roles' => $roles,
-                        'role_view' => 'index',
-                        'current_page' => $roles->currentPage(),
-                        'group_info' => $group_info
-                    ])->render()
-                ]);
-            } else {
                 return view('admin.Modules.Site_Settings.RolesManagement.index')->with([
                     'modname' => 'Roles Management',
                     'roles' => $roles,
                     'role_view' => 'index',
-                    'current_page' => $roles->currentPage(),
+                    'current_page' => 1,
                     'group_info' => $group_info
                 ]);
-            }
-        }
+
+
     }
 
     /**
@@ -333,7 +302,25 @@ class RolesController extends Controller
      */
     public function edit($id)
     {
-        //
+        $modules = Modules::orderby('name', 'ASC')->get();
+        $permissions = Permissions::orderby('access_type', 'ASC')->get();
+        $this->setRoleId($id);
+        $role =  $this->roles->findorfail($id);
+        $get_modules_with_roles = $this->roles->find($id)->GetRolesModules()->get();
+        $get_permissions_with_roles = ModulesPermissionsRoles::where('roles_id', $id)->get();
+        $get_mod_count = ModulesRoles::where('roles_id', $id)->get()->count();
+        $group_info = $this->roles->findorfail($id)->GetGroups()->get();
+        return view('admin.Modules.Site_Settings.RolesManagement.index')->with([
+            'modname' => 'Roles Management',
+            'role' => $role,
+            'role_view' => 'show',
+            'modules' => $modules,
+            'permissions' => $permissions,
+            'modules_roles' => $get_modules_with_roles,
+            'roles_permissions' => $get_permissions_with_roles,
+            'get_mods_count' => $get_mod_count,
+            'group_info' => $group_info
+        ]);
     }
 
     /**

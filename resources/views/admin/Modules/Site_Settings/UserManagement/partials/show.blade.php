@@ -1,41 +1,43 @@
-{{-- @if ($role_view == 'show_roles_modules') --}}
+@if (is_countable($users) && count($users) > 0)
+    <form action="">
+        <table class="table table-bordered table-striped table-hover table-sm" id="users_table" style="width: 100%">
+            <thead>
+                <tr>
+                    <th>Id</th>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Roles ID</th>
+                    <th>Created_at</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach ($users as $user)
+                    <tr>
+                        {{-- user id --}}
+                        <td><a href="{{ route('admin.users.show', ['id' => $user->id]) }}" class="text-muted">
+                                {{ $user->id }}</a>
+                        </td>
+                        {{-- user Name --}}
+                        <td><a href="{{ route('admin.users.show', ['id' => $user->id]) }}" class="text-muted">
+                                {{ $user->name }}</a>
+                        </td>
+                        {{-- user email --}}
+                        <td><a href="{{ route('admin.users.show', ['id' => $user->id]) }}" class="text-muted">
+                                {{ $user->email }}</a>
+                        </td>
+                        {{-- user role id --}}
+                        <td><a href="{{ route('admin.roles.edit', ['id' => $user->roles_id]) }}" class="text-muted">
+                                {{ $user->roles_id }}</a></td>
+                        {{-- created at --}}
+                        <td><a href="{{ route('admin.users.show', ['id' => $user->id]) }}" class="text-muted">
+                                {{ $user->created_at }}</a></td>
+                    </tr>
+                @endforeach
+            </tbody>
+        </table>
 
-    {{-- @endif --}}
-    <script>
-        $(function() {
-            /**
-             * SELECT 2
-             * ONLY use on specific elements that you want
-             */
-            $('.module_permissions_select2').select2({
-                theme: "classic",
-                width: 'resolve',
-                placeholder: 'Select all the permissions for this module per role.'
+    </form>
 
-            });
-            var mod_count = $('#mods_count').val();
-            for (x = 1; x <= mod_count; x++) {
-                $('#permissions_select2_' + x).on('select2:select', function(e) {
-                    var data = e.params.data;
-                    var mod_id = $(data.element).data('mod-id');
-                    var role_id = $("#use_for_role_id").val();
+@else
 
-                    UpdateModuleAccessforRolesSelect2(role_id, mod_id, data.id, "add_permissions");
-
-                });
-                $('#permissions_select2_' + x).on('select2:unselect', function(e) {
-                    var data = e.params.data;
-                    var mod_id = $(data.element).data('mod-id');
-                    var role_id = $("#use_for_role_id").val();
-
-                    UpdateModuleAccessforRolesSelect2(role_id, mod_id, data.id, "add_permissions");
-
-                });
-            }
-
-
-
-
-        });
-    </script>
-@endauth
+@endif

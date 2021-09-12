@@ -1,98 +1,63 @@
-<div class="row">
-    {{-- First show the option for updating the role name --}}
-    <div class="col-md-6">
-        <form action="">
-            @csrf
-            <div class="input-group mb-3">
-                <input type="text" class="form-control" name="role_name" id="role_name" value="{{ $role->name }}"
-                    aria-describedby="button-addon2">
-                <input type="hidden" name="role_id" id="use_for_role_id" value="{{ $role->id }}" />
-                <div class="input-group-append">
-                    <button type="submit" class="btn btn-primary"
-                        onclick="event.preventDefault();UpdateRoleName({{ $role->id }});">Update</button>
-                </div>
-            </div>
+<div>
+    @if (is_countable($roles) && count($roles) > 0)
+        <table class="table table-bordered table-striped table-hover table-sm" id="roles_table"  style="width: 100%">
+            <thead>
+                <tr>
+                    <th>Role Id</th>
+                    <th>Role Name</th>
+                    <th>Created On</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach ($roles as $role)
 
-    </div>
-    {{-- Next we will show role -> module -> permissions --}}
-    <div class="col-md-6">
 
-        {{-- Mdoules --}}
-        <div class="form-group">
-            <label for="">Modules</label>
-            <select multiple class="custom-select roles_permissions_select2" name="modules_select2" id="modules_select2"
-                style="width: 75%">
-                @foreach ($modules as $module)
                     @php
-                        $selected = '';
-                    @endphp
-                    @if (is_countable($modules_roles) && count($modules_roles))
-                        @foreach ($modules_roles as $module_assigned)
-                            @php
-
-                                if ($module_assigned->id == $module->id) {
-                                    $selected = 'selected';
+                        $attention = '';
+                        $disable = '';
+                        if (is_countable($group_info) && count($group_info) > 0) {
+                            foreach ($group_info as $gp_info) {
+                                if ($gp_info->id == $role->id) {
+                                    if (is_countable($gp_info->GetGroups) && count($gp_info->GetGroups)) {
+                                        //    dump($gp_info->GetGroups);
+                                    } else {
+                                        $disable = "disabled";
+                                        $attention = '<i class="bi bi-exclamation-circle-fill text-danger" data-toggle="tooltip" data-placement="right" title="Attention! No Group has been assigned to this role."></i>';
+                                    }
                                 }
+                            }
+                        }
+                    @endphp
 
-                            @endphp
-
-                        @endforeach
-                    @else
-                    @endif
-                    <option value="{{ $module->id }}" {{ $selected }}>{{ $module->name }}</option>
+                    <tr>
+                        <td scope="row">
+                            <a href="{{ route('admin.roles.edit', ['id' => $role->id]) }}"
+                            class="text-muted" aria-disabled="true" >{{ $role->id }}</a></td>
+                        <td><a href="{{ route('admin.roles.edit', ['id' => $role->id]) }}" class="text-muted" aria-disabled="true" >
+                                {{ $role->name }}</a> &nbsp;{!! $attention !!}&nbsp;
+                        </td>
+                        <td><a href="{{ route('admin.roles.edit', ['id' => $role->id]) }}"
+                            class="text-muted" aria-disabled="true" >{{ $role->created_at }}</a></td>
+                        <td style="text-align:center">
+                            {{-- <div class="btn-group" role="group" aria-label="Basic example"> --}}
+                                <a href="{{ route('admin.roles.show', ['id' => $role->id]) }}" type="button" class="btn btn-primary btn-sm">View</a>
+                                <a href="{{ route('admin.roles.edit', ['id' => $role->id]) }}" type="button" class="btn btn-success btn-sm">Edit</button>
+                                <a href="" type="button" class="btn btn-danger btn-sm">Delete</button>
+                              {{-- </div> --}}
+                        </td>
+                    </tr>
                 @endforeach
+            </tbody>
+        </table>
 
-
-            </select>
-        </div>
-        </form>
-    </div>
-
+    @else
+        <p>0 results were found!</p>
+    @endif
 </div>
-
-
-<div id="roles_modules_permission">
-
-    @include('admin.Modules.Site_Settings.RolesManagement.partials.permissions')
-</div>
-
-
-
-
-
-
-
 <script>
+    /** Bootstrap popover 09-08-2021 */
     $(function() {
-
-        /**
-         * SELECT 2
-         * ONLY use on specific elements that you want
-         */
-        $('.roles_permissions_select2').select2({
-            theme: "classic",
-            width: 'resolve',
-
-        });
-        $('#modules_select2').on('select2:select', function(e) {
-            var data = e.params.data;
-            //var role_id = $(data.element).data('role-id');
-            var role_id = $("#use_for_role_id").val();
-            console.log(role_id);
-            console.log(data.id);
-            UpdateModuleAccessforRolesSelect2(role_id, data.id, null, "add_roles_modules_access");
-
-
-        });
-        $('#modules_select2').on('select2:unselect', function(e) {
-            var data_to_del = e.params.data;
-            //var role_id_to_del = $(data_to_del.element).data('role-id');
-            var role_id = $("#use_for_role_id").val();
-            console.log(role_id);
-            UpdateModuleAccessforRolesSelect2(role_id, data_to_del.id, null,
-            "add_roles_modules_access");
-
-        });
-
-    });
+        $('[data-toggle="tooltip"]').tooltip()
+    })
 </script>

@@ -35,17 +35,17 @@
                             @switch($role_view)
                                 @case('index')
                                     <div>
-                                        @include('admin.Modules.Site_Settings.RolesManagement.partials.default')
+                                        @include('admin.Modules.Site_Settings.RolesManagement.partials.show')
                                     </div>
                                 @break
                                 @case('show')
-                                    @include('admin.Modules.Site_Settings.RolesManagement.partials.show')
+                                    @include('admin.Modules.Site_Settings.RolesManagement.partials.edit')
                                 @break
                                 @case('create')
                                     @include('admin.Modules.Site_Settings.RolesManagement.partials.create')
                                 @break
                                 @default
-                                    @include('admin.Modules.Site_Settings.RolesManagement.partials.default')
+                                    @include('admin.Modules.Site_Settings.RolesManagement.partials.show')
                             @endswitch
                         @else
                             <p>There are no views available!</p>

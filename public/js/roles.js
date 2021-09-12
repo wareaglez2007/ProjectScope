@@ -3,6 +3,11 @@
  * DOM Ready Section Will go below
  */
 $(function () {
+    $('#roles_table').DataTable({
+        processing: true,
+        serverSide: false
+    });
+
 
     /**
      * This is ajax pagination control for groups

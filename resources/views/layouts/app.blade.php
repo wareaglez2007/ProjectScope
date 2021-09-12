@@ -14,6 +14,7 @@
     <script src="{{ asset('js/app.js') }}" defer></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>{{-- upgraded to 1.12 --}}
     {{-- <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.3/jquery-ui.min.js" defer></script> --}}
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="{{ asset('js/dashboard.js') }}"></script>
     @yield('head')
     <!-- Fonts -->
@@ -325,7 +326,6 @@
         </div>
 
     </div>
-
     <script src="{{ asset('js/collapsemenuopen.js') }}" defer></script>
 
 </body>
