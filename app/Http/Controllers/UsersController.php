@@ -26,12 +26,88 @@ class UsersController extends Controller
 
         if (isset($request->search_q) && $request->search_q != null) {
 
+            $sortBy = "id";
+            $sortDir = "asc";
+            $direction = 'desc';
+            $current_direction = 'asc';
+            $icon_direction = "down";
+            if (isset($request->sortBy) && isset($request->sortDir)) {
+                if ($request->sortBy != 'id') {
+                    $sortBy = "id";
+                    $sortDir = "asc";
+                    $direction = 'asc';
+                    $current_direction = 'asc';
+                    $icon_direction = "down";
+                }
+
+                switch ($request->sortDir) {
+                    case 'desc':
+                        $direction = 'asc';
+                        $current_direction = 'desc';
+                        $icon_direction = "up-alt";
+                        break;
+
+                    default:
+                        $direction = 'desc';
+                        $icon_direction = "down";
+
+                        break;
+                }
+                $sortBy = $request->sortBy;
+                $sortDir = $request->sortDir;
+            }
+            $icon_directions = (object)[
+                'id_icon' => 'down',
+                'name_icon' => 'down',
+                'email_icon' => 'down',
+                'role_icon' => 'down',
+                'cd_icon' => 'down'
+            ];
+
+            if ($request->sortBy == "id") {
+                if ($direction == 'asc') {
+                    $icon_directions->id_icon = "up-alt";
+                } else {
+                    $icon_directions->id_icon = "down";
+                }
+            }
+            if ($request->sortBy == "name") {
+                if ($direction == 'asc') {
+                    $icon_directions->name_icon = "up-alt";
+                } else {
+                    $icon_directions->name_icon = "down";
+                }
+            }
+
+            if ($request->sortBy == "email") {
+                if ($direction == 'asc') {
+                    $icon_directions->email_icon = "up-alt";
+                } else {
+                    $icon_directions->email_icon = "down";
+                }
+            }
+            if ($request->sortBy == "roles_id") {
+                if ($direction == 'asc') {
+                    $icon_directions->role_icon = "up-alt";
+                } else {
+                    $icon_directions->role_icon = "down";
+                }
+            }
+            if ($request->sortBy == "created_at") {
+                if ($direction == 'asc') {
+                    $icon_directions->cd_icon = "up-alt";
+                } else {
+                    $icon_directions->cd_icon = "down";
+                }
+            }
+
+
             /** Number to show per page */
 
             $users = User::where('name', 'LIKE', "%{$request->search_q}%")
                 ->orwhere('email', 'LIKE', "%{$request->search_q}%")
                 ->orwhere('roles_id', 'LIKE', "%{$request->search_q}%")
-                ->orderby('id', 'ASC')->paginate(10);
+                ->orderby($sortBy, $sortDir)->paginate(10);
             $count = User::where('name', 'LIKE', "%{$request->search_q}%")
                 ->orwhere('email', 'LIKE', "%{$request->search_q}%")
                 ->orwhere('roles_id', 'LIKE', "%{$request->search_q}%")
@@ -48,13 +124,96 @@ class UsersController extends Controller
                         'users' => $users,
                         'search_q' => $request->search_q,
                         'search_count' => $count,
-                        'start_end' => $start_end
+                        'start_end' => $start_end,
+                        'direction' => $direction,
+                        'icon_directions' => $icon_directions,
+                        'sortby' => $sortBy,
+                        'current_direction' => $current_direction
                     ])->render()
                 ]);
             }
         } else {
+            $sortBy = "id";
+            $sortDir = "asc";
+            $direction = 'desc';
+            $current_direction = 'asc';
+            $icon_direction = "down";
+
+            // if ($request->sortBy != 'id') {
+            //     $sortBy = "id";
+            //     $sortDir = "asc";
+            //     $direction = 'asc';
+            //     $current_direction = 'asc';
+            //     $icon_direction = "down";
+            // }
+            if (isset($request->sortBy) && isset($request->sortDir)) {
+
+
+
+                switch ($request->sortDir) {
+                    case 'desc':
+                        $direction = 'asc';
+                        $current_direction = 'desc';
+                        $icon_direction = "up-alt";
+                        break;
+
+                    default:
+                        $direction = 'desc';
+                        $icon_direction = "down";
+
+                        break;
+                }
+                $sortBy = $request->sortBy;
+                $sortDir = $request->sortDir;
+            }
+            $icon_directions = (object)[
+                'id_icon' => 'down',
+                'name_icon' => 'down',
+                'email_icon' => 'down',
+                'role_icon' => 'down',
+                'cd_icon' => 'down'
+            ];
+
+            if ($request->sortBy == "id") {
+                if ($direction == 'asc') {
+                    $icon_directions->id_icon = "up-alt";
+                } else {
+                    $icon_directions->id_icon = "down";
+                }
+            }
+            if ($request->sortBy == "name") {
+                if ($direction == 'asc') {
+                    $icon_directions->name_icon = "up-alt";
+                } else {
+                    $icon_directions->name_icon = "down";
+                }
+            }
+
+            if ($request->sortBy == "email") {
+                if ($direction == 'asc') {
+                    $icon_directions->email_icon = "up-alt";
+                } else {
+                    $icon_directions->email_icon = "down";
+                }
+            }
+            if ($request->sortBy == "roles_id") {
+                if ($direction == 'asc') {
+                    $icon_directions->role_icon = "up-alt";
+                } else {
+                    $icon_directions->role_icon = "down";
+                }
+            }
+            if ($request->sortBy == "created_at") {
+                if ($direction == 'asc') {
+                    $icon_directions->cd_icon = "up-alt";
+                } else {
+                    $icon_directions->cd_icon = "down";
+                }
+            }
+
+
             $request->search_q = "";
-            $users =  User::orderBy('id', 'ASC')->paginate(10);
+            $users =  User::orderBy($sortBy, $sortDir)->paginate(10);
             $count = User::count();
             $start_end = $this->ShowStartEndPagination($users, $count);
             if ($request->ajax()) {
@@ -67,7 +226,12 @@ class UsersController extends Controller
                         'users' => $users,
                         'search_q' => $request->search_q,
                         'search_count' => $count,
-                        'start_end' => $start_end
+                        'start_end' => $start_end,
+                        'direction' => $direction,
+                        'icon_directions' => $icon_directions,
+                        'sortby' => $sortBy,
+                        'current_direction' => $current_direction
+
                     ])->render()
                 ]);
             } else {
@@ -78,7 +242,12 @@ class UsersController extends Controller
                     'users' => $users,
                     'search_q' => $request->search_q,
                     'search_count' => $count,
-                    'start_end' => $start_end
+                    'start_end' => $start_end,
+                    'direction' => $direction,
+                    'icon_direction' => $icon_direction,
+                    'sortby' => $sortBy,
+                    'current_direction' => $current_direction,
+                    'icon_directions' => (object)$icon_directions
                 ]);
             }
         }
@@ -188,6 +357,6 @@ class UsersController extends Controller
         $start_end =  "<p>Showing <b> $users_count_start </b> to
                     <b>$users_count_end</b> of <b><u>$count</u></b> entries.
                 </p>";
-         return $start_end;
+        return $start_end;
     }
 }
