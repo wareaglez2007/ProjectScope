@@ -5,7 +5,11 @@
 $(function () {
     $('#roles_table').DataTable({
         processing: true,
-        serverSide: false
+        serverSide: false,
+        'columnDefs': [ {
+            'targets': [3], /* column index */
+            'orderable': false, /* true or false */
+         }],
     });
 
 

@@ -5,7 +5,9 @@
 $(function () {
     $('#users_table').DataTable({
         processing: true,
-        serverSide: false
+        serverSide: false,
+
+
     });
 
 

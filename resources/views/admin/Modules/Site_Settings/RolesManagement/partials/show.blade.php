@@ -41,9 +41,9 @@
                             class="text-muted" aria-disabled="true" >{{ $role->created_at }}</a></td>
                         <td style="text-align:center">
                             {{-- <div class="btn-group" role="group" aria-label="Basic example"> --}}
-                                <a href="{{ route('admin.roles.show', ['id' => $role->id]) }}" type="button" class="btn btn-primary btn-sm">View</a>
-                                <a href="{{ route('admin.roles.edit', ['id' => $role->id]) }}" type="button" class="btn btn-success btn-sm">Edit</button>
-                                <a href="" type="button" class="btn btn-danger btn-sm">Delete</button>
+                                <a href="{{ route('admin.roles.show', ['id' => $role->id]) }}" type="button" class="btn btn-info btn-sm">View</a>
+                                <a href="{{ route('admin.roles.edit', ['id' => $role->id]) }}" type="button" class="btn btn-secondary btn-sm">Edit</a>
+                                <a href="" type="button" class="btn btn-danger btn-sm">Delete</a>
                               {{-- </div> --}}
                         </td>
                     </tr>
