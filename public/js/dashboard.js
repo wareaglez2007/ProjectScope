@@ -17,7 +17,7 @@ function HandleAjaxResponsesToast(delay_time, div_color, uid, message, status_co
     var toast =
         '<div id="location_toast_' + uid +
         '" class="toast hide" role="alert" aria-live="assertive" aria-atomic="true" data-delay="' +
-        delay + '" style="position: absolute; top: 0; right: 0; z-index: 9999;">' +
+        delay + '" >' +
         '<div class="toast-header  ' + toast_class + '" style="background-color: ' +
         color +
         ' !important; color:#ffffff !important; "> <i class="bi bi-exclamation-square"></i>&nbsp;' +
@@ -60,3 +60,13 @@ function HandleAjaxResponsesToast(delay_time, div_color, uid, message, status_co
 $(function () {
     $('[data-toggle="tooltip"]').tooltip()
 })
+
+
+/**
+ * Get a random number max is the number your choose the range for
+ * @param {*} max
+ * @returns
+ */
+function getRandomInt(max) {
+    return Math.floor(Math.random() * max);
+}

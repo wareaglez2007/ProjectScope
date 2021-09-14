@@ -1,13 +1,9 @@
 {{-- @if ($role_view == 'show_roles_modules') --}}
 @if (is_countable($modules_roles) && count($modules_roles))
 
-
-
-
-
     <form action="">
         <input type="hidden" value="{{ $get_mods_count }}" id="mods_count" />
-        <table class="table table-bordered table-inverse">
+        <table class="table table-bordered table-striped table-sm" id="edit_permissions_roles">
             <thead class="thead-inverse">
                 <tr>
                     <th>Group(s) Belongs to</th>

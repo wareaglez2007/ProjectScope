@@ -16,13 +16,12 @@
                 {{-- -ROW 1 --}}
                 <div class="row">
                     {{-- Manage Roles --}}
-                    <table class="table table-bordered">
+                    <table class="table">
 
                         <tbody>
                             <tr>
                                 <td scope="row"><a href="" class="btn btn-success btn-sm">Create New Role</a></td>
-                                <td><a href="" class="btn btn-warning btn-sm">See Permissions</a></td>
-                                <td><a href="{{ route('admin.roles') }}" class="btn btn-info btn-sm">See All Roles</a></td>
+                                <td><a href="{{ route('admin.roles') }}" class="btn btn-primary btn-sm">See All Roles</a></td>
                             </tr>
                         </tbody>
                     </table>
@@ -35,17 +34,20 @@
                             @switch($role_view)
                                 @case('index')
                                     <div>
-                                        @include('admin.Modules.Site_Settings.RolesManagement.partials.show')
+                                        @include('admin.Modules.Site_Settings.RolesManagement.partials.default')
                                     </div>
                                 @break
                                 @case('show')
+                                    @include('admin.Modules.Site_Settings.RolesManagement.partials.show')
+                                @break
+                                 @case('edit')
                                     @include('admin.Modules.Site_Settings.RolesManagement.partials.edit')
                                 @break
                                 @case('create')
                                     @include('admin.Modules.Site_Settings.RolesManagement.partials.create')
                                 @break
                                 @default
-                                    @include('admin.Modules.Site_Settings.RolesManagement.partials.show')
+                                    @include('admin.Modules.Site_Settings.RolesManagement.partials.default')
                             @endswitch
                         @else
                             <p>There are no views available!</p>

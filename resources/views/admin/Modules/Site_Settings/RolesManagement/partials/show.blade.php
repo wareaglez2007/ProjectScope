@@ -1,63 +1,92 @@
-<div>
-    @if (is_countable($roles) && count($roles) > 0)
-        <table class="table table-bordered table-striped table-hover table-sm" id="roles_table"  style="width: 100%">
-            <thead>
-                <tr>
-                    <th>Role Id</th>
-                    <th>Role Name</th>
-                    <th>Created On</th>
-                    <th></th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach ($roles as $role)
+<table class="table table-bordered table-hover table-sm">
+    <thead>
+        <tr>
+            <th>Group Id</th>
+            <th>Group Name</th>
+            <th>Role ID</th>
+            <th>Role Name</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            @if (is_countable($group_info) && count($group_info) > 0)
 
+                @if (count($group_info) > 1)
 
-                    @php
-                        $attention = '';
-                        $disable = '';
-                        if (is_countable($group_info) && count($group_info) > 0) {
-                            foreach ($group_info as $gp_info) {
-                                if ($gp_info->id == $role->id) {
-                                    if (is_countable($gp_info->GetGroups) && count($gp_info->GetGroups)) {
-                                        //    dump($gp_info->GetGroups);
-                                    } else {
-                                        $disable = "disabled";
-                                        $attention = '<i class="bi bi-exclamation-circle-fill text-danger" data-toggle="tooltip" data-placement="right" title="Attention! No Group has been assigned to this role."></i>';
-                                    }
-                                }
-                            }
-                        }
-                    @endphp
+                    <td scope="row">
+                        <ol>
+                            @foreach ($group_info as $group)
+                                <li>
+                                    {{ $group->name }}
+                                </li>
+                            @endforeach
+                        </ol>
+                    </td>
 
-                    <tr>
-                        <td scope="row">
-                            <a href="{{ route('admin.roles.edit', ['id' => $role->id]) }}"
-                            class="text-muted" aria-disabled="true" >{{ $role->id }}</a></td>
-                        <td><a href="{{ route('admin.roles.edit', ['id' => $role->id]) }}" class="text-muted" aria-disabled="true" >
-                                {{ $role->name }}</a> &nbsp;{!! $attention !!}&nbsp;
+                @else
+                    @foreach ($group_info as $gp)
+                        <td>
+                            {{ $gp->id }}
                         </td>
-                        <td><a href="{{ route('admin.roles.edit', ['id' => $role->id]) }}"
-                            class="text-muted" aria-disabled="true" >{{ $role->created_at }}</a></td>
-                        <td style="text-align:center">
-                            {{-- <div class="btn-group" role="group" aria-label="Basic example"> --}}
-                                <a href="{{ route('admin.roles.show', ['id' => $role->id]) }}" type="button" class="btn btn-info btn-sm">View</a>
-                                <a href="{{ route('admin.roles.edit', ['id' => $role->id]) }}" type="button" class="btn btn-secondary btn-sm">Edit</a>
-                                <a href="" type="button" class="btn btn-danger btn-sm">Delete</a>
-                              {{-- </div> --}}
+                        <td>
+                            {{ $gp->name }}
                         </td>
-                    </tr>
+                    @endforeach
+                @endif
+
+            @else
+                <td scope="row" class="text-danger"><i class="bi bi-exclamation-circle-fill"></i>&nbsp;Group has NOT
+                    been assigned!</td>
+                <td scope="row" class="text-danger"><i class="bi bi-exclamation-circle-fill"></i>&nbsp;Group has NOT
+                    been assigned!</td>
+            @endif
+            <td scope="row">{{ $role->id }}</td>
+            <td>{{ $role->name }}</td>
+        </tr>
+    </tbody>
+</table>
+
+<table class="table table-bordered table-hover table-striped table-sm" id="show_roles_modules_permissions"
+    style="width: 100%">
+    <thead>
+        <th>Moulde Id</th>
+        <th>Module Name</th>
+        <th>Permissions</th>
+    </thead>
+    <tbody>
+        @foreach ($modules as $module)
+
+            @if (is_countable($modules_roles) && count($modules_roles))
+                @foreach ($modules_roles as $module_assigned)
+                    @if ($module_assigned->id == $module->id)
+                        <tr>
+                            <td>{{ $module->id }}</td>
+
+                            <td>{{ $module->name }}</td>
+                            <td>
+
+                                @foreach ($permissions as $permission)
+                                    @if (is_countable($roles_permissions) && count($roles_permissions))
+
+                                        @foreach ($roles_permissions as $role_perm)
+                                            @if ($role_perm->permissions_id == $permission->id && $role_perm->modules_id == $module_assigned->id)
+
+                                                <button class="btn btn-info btn-sm disabled"
+                                                    value="{{ $permission->id }}">{{ $permission->access_type }}</button>
+
+                                            @endif
+                                        @endforeach
+
+                                    @endif
+                                @endforeach
+
+                            </td>
+                        </tr>
+
+                    @endif
                 @endforeach
-            </tbody>
-        </table>
-
-    @else
-        <p>0 results were found!</p>
-    @endif
-</div>
-<script>
-    /** Bootstrap popover 09-08-2021 */
-    $(function() {
-        $('[data-toggle="tooltip"]').tooltip()
-    })
-</script>
+            @else
+            @endif
+        @endforeach
+    </tbody>
+</table>

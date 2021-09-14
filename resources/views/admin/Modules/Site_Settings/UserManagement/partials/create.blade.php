@@ -1,43 +1,76 @@
-<thead id="users_table_data">
-    <tr>
-        {{-- ('bi bi-sort-numeric-up-alt', 'bi bi-sort-numeric-down'); --}}
-        {{-- sortListsBy(selector, by, direction, icon_name, switch_icon) --}}
-        <th
-            onclick="sortListsBy('sort-by_id_asc', 'id', '{{ $direction }}', 'bi bi-sort-numeric-down', 'bi bi-sort-numeric-up-alt' );">
-            <a class="text-muted" id="sort-by_id_asc">Id&nbsp;
-                <i class="bi bi-sort-numeric-{{ $icon_directions->id_icon }} h5">
-                </i>
-            </a>
-        </th>
-        <th
-            onclick="sortListsBy('sort-by_name_asc', 'name', '{{ $direction }}', 'bi bi-sort-alpha-down', 'bi bi-sort-alpha-up-alt' );">
-            <a class="text-muted" id="sort-by_name_asc">Name&nbsp;
-                <i class="bi bi-sort-alpha-{{ $icon_directions->name_icon }} h5">
-                </i>
-            </a>
-        </th>
-        <th
-            onclick="sortListsBy('sort-by_email_asc', 'email', '{{ $direction }}', 'bi bi-sort-alpha-down', 'bi bi-sort-alpha-up-alt' );">
-            <a class="text-muted" id="sort-by_email_asc">Email&nbsp;
-                <i class="bi bi-sort-alpha-{{ $icon_directions->email_icon }} h5"></i>
-            </a>
-        </th>
+{{-- Create new user form --}}
+
+    <form action="{{ route('admin.users.store') }}">
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="">Name <i class="bi bi-asterisk text-danger"></i></label>
+                    <input type="text" name="user_name" id="user_name" class="form-control" placeholder=""
+                        aria-describedby="helpId">
+                    <small id="helpId" class="text-muted">Enter your name</small>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="user_email" class="h6">Email <i
+                            class="bi bi-asterisk text-danger"></i></label>
+                    <input type="email" name="user_email" id="user_email" class="form-control"
+                        placeholder="youremail@domain.com" aria-describedby="helpId">
+                    <small id="helpId" class="text-muted">Enter your email address</small>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="">Password <i class="bi bi-asterisk text-danger"></i></label>
+                    <input type="password" name="user_pass" id="user_pass" class="form-control" placeholder=""
+                        aria-describedby="helpId" minlength="8">
+                    <small id="helpId" class="text-muted">Must be 8 charecters minimum</small>
+                </div>
+            </div>
+        </div>
+        @if (is_countable($roles) && count($roles) > 0)
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="">Roles</label>
+                        <select multiple class="custom-select users_roles_select2" name="user_role_select2"
+                            id="role_select2" style="width: 100%">
+                            @foreach ($roles as $role)
+
+                                <option value="{{ $role->id }}" data-mod-id="{{ $role->id }}">
+                                    {{ $role->name }}
+                                </option>
+                            @endforeach
 
 
-        <th
-            onclick="sortListsBy('sort-by_role_asc', 'roles_id', '{{ $direction }}', 'bi bi-sort-alpha-down', 'bi bi-sort-alpha-up-alt' );">
-            <a class="text-muted" id="sort-by_role_asc">RoleId&nbsp;
-                <i class="bi bi-sort-alpha-{{ $icon_directions->role_icon }} h5"></i>
-            </a>
-        </th>
-        <th
-            onclick="sortListsBy('sort-by_cd_asc', 'created_at', '{{ $direction }}', 'bi bi-sort-numeric-down', 'bi bi-sort-numeric-up-alt' );">
-            <a class="text-muted" id="sort-by_cd_asc">CreatedAt&nbsp;
-                <i class="bi bi-sort-numeric-{{ $icon_directions->cd_icon }} h5"></i>
-            </a>
-        </th>
-    </tr>
-    <input type="hidden" id="current_page_num" value="{{ $users->currentPage() }}" />
-    <input type="hidden" id="current_sort_direction" value="{{ $current_direction }}" />
-    <input type="hidden" id="current_sort_by" value="{{ $sortby }}" />
-</thead>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        @else
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <div class="form-check">
+                            <label class="form-check-label">
+                                <input type="checkbox" class="form-check-input" name="single_role" id="single_role"
+                                    value="checkedValue" checked>
+                                Guest
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        @endif
+        <div class="row">
+            <div class="col-md-6">
+                <a class="btn btn-primary" id="create_new_user">Create User</a>
+            </div>
+        </div>
+    </form>
+

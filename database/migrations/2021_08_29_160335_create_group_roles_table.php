@@ -36,6 +36,6 @@ class CreateGroupRolesTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('group_roles');
+        Schema::dropIfExists('groups_roles');
     }
 }

@@ -21,7 +21,7 @@ class Groups extends Model
         'updated_at'
     ];
 
-    public const ADMIN_GROUP = 1001;
+    public const ADMIN_GROUP = "wareaglez2007@hotmail.com";
 
     /**
      * @param String where

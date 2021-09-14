@@ -8,6 +8,12 @@ use app\Models\Groups;
 use app\Models\Modules;
 use app\Models\Permissions;
 use App\Models\Roles;
+use App\Models\RolesUser;
+use \Illuminate\Support\Facades\Route;
+use Illuminate\Foundation\Auth\RegistersUsers;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Str;
 
 class UsersController extends Controller
 {
@@ -22,19 +28,80 @@ class UsersController extends Controller
      */
     public function index(Request $request)
     {
+        $routes = Route::getRoutes();
 
-        $users = User::all();
-
-                return view('admin.Modules.Site_Settings.UserManagement.index')->with([
-                    'modname' => 'Users Management',
-                    'user_view' => 'index',
-                    'current_page' => 1,
-                    'users' => $users,
-
-                ]);
-
-
+        return view('admin.Modules.Site_Settings.UserManagement.index')->with([
+            'modname' => 'Users Management',
+            'user_view' => 'index',
+            'current_page' => 1,
+        ]);
     }
+    public function GetUsersData(Request $request)
+    {
+        if ($request->exists('draw')) {
+            ## Read value
+            $draw = $request->draw;
+            $start = $request->start;
+            $rowperpage = $request->length; // Rows display per page
+
+            $columnIndex_arr = $request->order;
+            $columnName_arr = $request->columns;
+            $order_arr = $request->order;
+            $search_arr = $request->search;
+
+            $columnIndex = $columnIndex_arr[0]['column']; // Column index
+            $columnName = $columnName_arr[$columnIndex]['data']; // Column name
+            $columnSortOrder = $order_arr[0]['dir']; // asc or desc
+            $searchValue = $search_arr['value']; // Search value
+
+            // Total records
+            $totalRecords = User::select('count(*) as allcount')
+                ->count();
+            $totalRecordswithFilter = User::select('count(*) as allcount')
+                ->where('name', 'like', '%' . $searchValue . '%')
+                ->orwhere('email', 'like', '%' . $searchValue . '%')
+                ->count();
+
+            // Fetch records
+            $records = User::orderBy($columnName, $columnSortOrder)
+                ->where('name', 'like', '%' . $searchValue . '%')
+                ->orwhere('email', 'like', '%' . $searchValue . '%')
+                ->skip($start)
+                ->take($rowperpage)
+                ->get();
+
+            $data_arr = array();
+
+            foreach ($records as $record) {
+                $id = $record->id;
+                $name = $record->name;
+                $email = $record->email;
+                $created_at = date('m-d-Y @ H:i:s', strtotime($record->created_at));
+
+                $data_arr[] = array(
+                    "id" => $id,
+                    "name" => $name,
+                    "email" => $email,
+                    "created_at" => $created_at,
+                    "actions" => $id,
+
+
+                );
+            }
+
+            $response = array(
+                "draw" => intval($draw),
+                "iTotalRecords" => $totalRecords,
+                "iTotalDisplayRecords" => $totalRecordswithFilter,
+                "aaData" => $data_arr
+            );
+
+            return response()->json($response);
+        }
+    }
+
+
+
 
     /**
      * Show the form for creating a new resource.
@@ -43,7 +110,14 @@ class UsersController extends Controller
      */
     public function create()
     {
-        //
+        $roles = Roles::whereNotIn('name', ['admin'])->get();
+        return view('admin.Modules.Site_Settings.UserManagement.index')->with([
+            'modname' => 'Users Management - Create new user',
+            'user_view' => 'create',
+            'current_page' => 1,
+            'roles' => $roles
+
+        ]);
     }
 
     /**
@@ -54,7 +128,45 @@ class UsersController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $roles = Roles::whereNotIn('name', ['admin'])->get();
+        if ($request->exists('name') && $request->exists('email') && $request->exists('pass') && $request->exists('roles')) {
+            $selected_roles = json_decode(stripslashes($request->roles));
+
+            $validatedData = $request->validate([
+                'name' => ['required', 'string', 'max:255'],
+                'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
+                'pass' => ['required', 'string', 'min:8'],
+            ]);
+            $create =  User::create([
+                'name' => $request->name,
+                'email' => $request->email,
+                'uuid' => Str::uuid(),
+                'password' => Hash::make($request->pass),
+            ]);
+            if ($create) {
+                foreach ($selected_roles as $role) {
+
+                    $create_roles_users =  RolesUser::create([
+                        'users_id' => $create->id,
+                        'roles_id' => $role,
+                    ]);
+                }
+                $response_messages['success'] = "New user has been added.";
+            } else {
+                $response_messages['error'] = "Unable to add new user.";
+            }
+            if ($request->ajax()) {
+                return response()->json([
+                    "response" => $response_messages,
+                    'view' => view('admin.Modules.Site_Settings.UserManagement.partials.create')->with([
+                        'modname' => 'Users Management - Create new user',
+                        'user_view' => 'create',
+                        'current_page' => 1,
+                        'roles' => $roles
+                    ])->render()
+                ]);
+            }
+        }
     }
 
     /**
@@ -141,5 +253,14 @@ class UsersController extends Controller
                     <b>$users_count_end</b> of <b><u>$count</u></b> entries.
                 </p>";
         return $start_end;
+    }
+
+    protected function validator(array $data)
+    {
+        return Validator::make($data, [
+            'name' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
+            'password' => ['required', 'string', 'min:8', 'confirmed'],
+        ]);
     }
 }

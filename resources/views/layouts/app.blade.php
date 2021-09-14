@@ -29,8 +29,9 @@
 
 <body>
     <!-- Flexbox container for aligning the toasts -->
-    <div aria-live="polite" aria-atomic="true" class="d-flex justify-content-center align-items-center position-sticky"
-        style="position: relative; top:100px; z-index:9999;" id="dashboard_toast">
+    <div aria-live="polite" aria-atomic="true" class="justify-content-center align-items-center position-sticky"
+        style="position: relative; top:0; z-index:9999;" >
+        <div style="position: absolute; top: 0; right: 0; z-index: 9999;" id="dashboard_toast"></div>
     </div>
     <div id="app">
 
@@ -223,7 +224,7 @@
                                     </a>
                                 </li>
                             </ul>
-                            @if (Auth::user()->id == 1001)
+                            @if (Auth::user()->email == Groups::ADMIN_GROUP)
 
                                 <h6
                                     class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1">

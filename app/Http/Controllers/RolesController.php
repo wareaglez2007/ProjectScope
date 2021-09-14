@@ -115,7 +115,7 @@ class RolesController extends Controller
     public function create()
     {
         return view('admin.Modules.Site_Settings.RolesManagement.index')->with([
-            'modname' => 'Roles Management',
+            'modname' => 'Roles Management - Create New Role',
             'role_view' => 'create'
 
         ]);
@@ -278,11 +278,9 @@ class RolesController extends Controller
         $get_permissions_with_roles = ModulesPermissionsRoles::where('roles_id', $id)->get();
         $get_mod_count = ModulesRoles::where('roles_id', $id)->get()->count();
         $group_info = $this->roles->findorfail($id)->GetGroups()->get();
-        // dd($group_info);
-        //dd($get_mod_count);
-        //   dd($get_permissions_with_roles);
+
         return view('admin.Modules.Site_Settings.RolesManagement.index')->with([
-            'modname' => 'Roles Management',
+            'modname' => 'Roles Management - View Only Mode',
             'role' => $role,
             'role_view' => 'show',
             'modules' => $modules,
@@ -311,9 +309,9 @@ class RolesController extends Controller
         $get_mod_count = ModulesRoles::where('roles_id', $id)->get()->count();
         $group_info = $this->roles->findorfail($id)->GetGroups()->get();
         return view('admin.Modules.Site_Settings.RolesManagement.index')->with([
-            'modname' => 'Roles Management',
+            'modname' => 'Roles Management - Edit Mode',
             'role' => $role,
-            'role_view' => 'show',
+            'role_view' => 'edit',
             'modules' => $modules,
             'permissions' => $permissions,
             'modules_roles' => $get_modules_with_roles,

@@ -14,12 +14,12 @@
                 {{-- -ROW 1 --}}
                 <div class="row">
                     {{-- Manage Roles --}}
-                    <table class="table table-bordered">
+                    <table class="table">
 
                         <tbody>
                             <tr>
-                                <td scope="row"><a href="" class="btn btn-success btn-sm">Create New Role</a></td>
-                                <td><a href="" class="btn btn-warning btn-sm">See Permissions</a></td>
+                                <td scope="row"><a href="{{ route('admin.users.create') }}"
+                                        class="btn btn-success btn-sm">Create New User</a></td>
                                 <td><a href="{{ route('admin.users') }}" class="btn btn-info btn-sm">See All Users</a></td>
                             </tr>
                         </tbody>
@@ -32,16 +32,25 @@
                         @if (null !== $user_view)
                             @switch($user_view)
                                 @case('index')
+                                    @include('admin.Modules.Site_Settings.UserManagement.partials.default')
+                                        {{-- DO NOT REMOVE THE javascript from here!!! --}}
+                                        <script src="{{ asset('js/userDatatables.js') }}" defer></script>
+                                @break
+                                @case('show')
                                     @include('admin.Modules.Site_Settings.UserManagement.partials.show')
                                 @break
-                                @case('show_user')
+                                @case('edit')
                                     @include('admin.Modules.Site_Settings.UserManagement.partials.edit')
                                 @break
                                 @case('create')
+                                <div id="create_new_user_section">
                                     @include('admin.Modules.Site_Settings.UserManagement.partials.create')
+                                </div>
                                 @break
                                 @default
-                                    @include('admin.Modules.Site_Settings.UserManagement.partials.show')
+                                    @include('admin.Modules.Site_Settings.UserManagement.partials.default')
+                                    {{-- DO NOT REMOVE THE javascript from here!!! --}}
+                                    <script src="{{ asset('js/userDatatables.js') }}" defer></script>
                             @endswitch
                         @else
                             <p>There are no views available!</p>

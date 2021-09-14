@@ -2,17 +2,32 @@
  * 09-04-2021
  * DOM Ready Section Will go below
  */
+
+/** Jquery DataTables */
 $(function () {
     $('#roles_table').DataTable({
         processing: true,
         serverSide: false,
-        'columnDefs': [ {
+        'columnDefs': [{
             'targets': [3], /* column index */
             'orderable': false, /* true or false */
-         }],
+        }],
     });
 
 
+    $('#show_roles_modules_permissions').DataTable({
+        processing: true,
+        serverSide: false,
+
+
+    });
+
+    $("#edit_permissions_roles").DataTable({
+        processing: true,
+        serverSide: false,
+    });
+    /** Bootstrap popover 09-08-2021 */
+    $('[data-toggle="tooltip"]').tooltip();
     /**
      * This is ajax pagination control for groups
      */
