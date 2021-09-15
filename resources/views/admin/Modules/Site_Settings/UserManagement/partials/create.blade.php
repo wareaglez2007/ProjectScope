@@ -69,8 +69,27 @@
         @endif
         <div class="row">
             <div class="col-md-6">
-                <a class="btn btn-primary" id="create_new_user">Create User</a>
+                <a class="btn btn-primary" id="create_new_user" onclick=" event.preventDefault();CreateNewUser();">Create User</a>
             </div>
         </div>
     </form>
 
+
+<script>
+    $(function() {
+
+
+
+        $('.users_roles_select2').select2({
+            theme: "classic",
+            width: 'resolve',
+            placeholder: 'Select all roles for this new user!'
+
+        });
+        $('#role_select2').on('select2:select', function(e) {
+            var data = e.params.data;
+        });
+
+
+    }); //END of DOM ON READY <<-------------------
+</script>

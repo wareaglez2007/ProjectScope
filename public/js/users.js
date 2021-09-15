@@ -25,10 +25,8 @@ $(function () {
 
 }); //END of DOM ON READY <<-------------------
 
+function CreateNewUser() {
 
-
-$('#create_new_user').on('click', function (e) {
-    e.preventDefault();
     var roles = $('#role_select2').val();
     var string_roles = JSON.stringify(roles);
     var full_name = $("#user_name").val();
@@ -80,7 +78,7 @@ $('#create_new_user').on('click', function (e) {
                 toastcolor = "#dc3545";
                 toast_message = error.responseJSON.message;
 
-              //  HandleAjaxResponsesToast(2300, toastcolor, 1, toast_message, 422);
+                //  HandleAjaxResponsesToast(2300, toastcolor, 1, toast_message, 422);
 
                 $.each(error.responseJSON.errors, function (index, val) {
                     HandleAjaxResponsesToast(2300, toastcolor, index, val, error.status);
@@ -93,5 +91,7 @@ $('#create_new_user').on('click', function (e) {
 
         } //end of error
     }); //end of ajax
-})
+}
+
+
 

@@ -153,8 +153,12 @@ class UsersController extends Controller
                 }
                 $response_messages['success'] = "New user has been added.";
             } else {
+
                 $response_messages['error'] = "Unable to add new user.";
             }
+
+
+
             if ($request->ajax()) {
                 return response()->json([
                     "response" => $response_messages,

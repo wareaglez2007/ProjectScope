@@ -33,8 +33,8 @@
                             @switch($user_view)
                                 @case('index')
                                     @include('admin.Modules.Site_Settings.UserManagement.partials.default')
-                                        {{-- DO NOT REMOVE THE javascript from here!!! --}}
-                                        <script src="{{ asset('js/userDatatables.js') }}" defer></script>
+                                    {{-- DO NOT REMOVE THE javascript from here!!! --}}
+                                    <script src="{{ asset('js/userDatatables.js') }}" defer></script>
                                 @break
                                 @case('show')
                                     @include('admin.Modules.Site_Settings.UserManagement.partials.show')
@@ -43,9 +43,9 @@
                                     @include('admin.Modules.Site_Settings.UserManagement.partials.edit')
                                 @break
                                 @case('create')
-                                <div id="create_new_user_section">
-                                    @include('admin.Modules.Site_Settings.UserManagement.partials.create')
-                                </div>
+                                    <div id="create_new_user_section">
+                                        @include('admin.Modules.Site_Settings.UserManagement.partials.create')
+                                    </div>
                                 @break
                                 @default
                                     @include('admin.Modules.Site_Settings.UserManagement.partials.default')
