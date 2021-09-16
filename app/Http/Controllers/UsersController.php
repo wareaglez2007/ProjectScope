@@ -3,10 +3,10 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use app\Models\User;
-use app\Models\Groups;
-use app\Models\Modules;
-use app\Models\Permissions;
+use App\Models\User;
+use App\Models\Groups;
+use App\Models\Modules;
+use App\Models\Permissions;
 use App\Models\Roles;
 use App\Models\RolesUser;
 use \Illuminate\Support\Facades\Route;
@@ -181,11 +181,19 @@ class UsersController extends Controller
      */
     public function show($id)
     {
-        $userRole = User::with('userRole')->findorfail($id); //Will return user role information
+        //  $userRole = User::with('userRole')->findorfail($id); //Will return user role information
 
-        $userGroups = User::with('userGroups')->findOrFail($id); // will return GroupsRoles info $userGroups->userGroups->groups_id
+        //  $userGroups = User::with('userGroups')->findOrFail($id); // will return GroupsRoles info $userGroups->userGroups->groups_id
 
-        $userModulesPermissions = User::findOrFail($id)->GetAllRolesModsPerms()->orderby('id', 'ASC')->paginate(10);
+        // $userModulesPermissions = User::findOrFail($id)->GetAllRolesModsPerms()->get();
+        $roles_t = new Roles();
+        $rolesusers = User::find($id);
+        $permissions_roles_mods = [];
+        foreach ($rolesusers->roles as $k => $role) {
+            $modulespermissionsroles = $roles_t->find($role->id)->modulepermissions()->get();
+            $permissions_roles_mods[] = $modulespermissionsroles;
+        }
+       // dd($permissions_roles_mods);
 
 
         $modules = Modules::orderby('name', 'ASC')->get();
@@ -193,9 +201,17 @@ class UsersController extends Controller
         $roles = Roles::orderby('name', 'ASC')->get();
         $groups = Groups::orderby('name', 'ASC')->get();
 
-        return view('admin.Modules.Site_Settings.UserManagement.partials.show')->with([
+        return view('admin.Modules.Site_Settings.UserManagement.index')->with([
             'modname' => 'Users Management - Individual view',
             'user_view' => 'show',
+            'user' => $rolesusers,
+            'modules' => $modules,
+            'permissions' => $permissions,
+            'roles' => $roles,
+            '$groups' => $groups,
+            'mprs' => $permissions_roles_mods
+
+
         ]);
     }
 

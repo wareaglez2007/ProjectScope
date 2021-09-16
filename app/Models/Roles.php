@@ -39,4 +39,12 @@ class Roles extends Model
     // {
     //     return $this->belongsToMany(Modules::class);
     // }
+
+
+    public function modulepermissions()
+    {
+        return $this->belongsTo(ModulesPermissionsRoles::class, 'id', 'roles_id');
+    }
+
+
 }

@@ -43,23 +43,13 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
     ];
 
+
+
     /**
-     * Return Role ID and Info Associated with User
+     * this will return all the roles assigned to a user
      */
-    public function userRole()
+    public function roles()
     {
-        return $this->belongsto(Roles::class, 'roles_id', 'id');
-    }
-
-    public function GetAllRolesModsPerms()
-    {
-
-        return $this->belongsToMany(ModulesPermissionsRoles::class, GroupsRoles::class,'roles_id', 'roles_id', 'roles_id', 'roles_id');
-    }
-
-
-    public function userGroups()
-    {
-        return $this->belongsTo(GroupsRoles::class, 'roles_id', 'roles_id');
+        return $this->belongsToMany(Roles::class, 'roles_users', 'users_id');
     }
 }
