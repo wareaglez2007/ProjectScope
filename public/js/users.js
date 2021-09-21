@@ -22,6 +22,29 @@ $(function () {
 
     });
 
+    $('#show_user_table').DataTable({
+        processing: true,
+        serverSide: false,
+        paging: false,
+       // "ajax": '/admin/users/getusers',
+        // columns: [
+        //     { data: 'id' },
+        //     { data: 'name' },
+        //     { data: 'email' },
+        //     { data: 'roles' },
+        //     { data: 'permissions' },
+        //     { data: 'created_at' },
+
+        // ],
+        'columnDefs': [{
+            'targets': [5], /* column index  actions column*/
+            'orderable': false, /* true or false */
+
+        }],
+
+
+    });
+
 
 }); //END of DOM ON READY <<-------------------
 

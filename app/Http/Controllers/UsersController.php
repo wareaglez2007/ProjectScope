@@ -181,21 +181,16 @@ class UsersController extends Controller
      */
     public function show($id)
     {
-        //  $userRole = User::with('userRole')->findorfail($id); //Will return user role information
 
-        //  $userGroups = User::with('userGroups')->findOrFail($id); // will return GroupsRoles info $userGroups->userGroups->groups_id
-
-        // $userModulesPermissions = User::findOrFail($id)->GetAllRolesModsPerms()->get();
         $roles_t = new Roles();
         $rolesusers = User::find($id);
         $permissions_roles_mods = [];
         foreach ($rolesusers->roles as $k => $role) {
             $modulespermissionsroles = $roles_t->find($role->id)->modulepermissions()->get();
-            $permissions_roles_mods[] = $modulespermissionsroles;
+            foreach ($modulespermissionsroles as $modspers) {
+                $permissions_roles_mods[] = $modspers;
+            }
         }
-       // dd($permissions_roles_mods);
-
-
         $modules = Modules::orderby('name', 'ASC')->get();
         $permissions = Permissions::orderby('access_type', 'ASC')->get();
         $roles = Roles::orderby('name', 'ASC')->get();
@@ -223,7 +218,32 @@ class UsersController extends Controller
      */
     public function edit($id)
     {
-        //
+        $roles_t = new Roles();
+        $rolesusers = User::find($id);
+        $permissions_roles_mods = [];
+        foreach ($rolesusers->roles as $k => $role) {
+            $modulespermissionsroles = $roles_t->find($role->id)->modulepermissions()->get();
+            foreach ($modulespermissionsroles as $modspers) {
+                $permissions_roles_mods[] = $modspers;
+            }
+        }
+        $modules = Modules::orderby('name', 'ASC')->get();
+        $permissions = Permissions::orderby('access_type', 'ASC')->get();
+        $roles = Roles::orderby('name', 'ASC')->get();
+        $groups = Groups::orderby('name', 'ASC')->get();
+
+        return view('admin.Modules.Site_Settings.UserManagement.index')->with([
+            'modname' => 'Users Management - Individual view',
+            'user_view' => 'edit',
+            'user' => $rolesusers,
+            'modules' => $modules,
+            'permissions' => $permissions,
+            'roles' => $roles,
+            '$groups' => $groups,
+            'mprs' => $permissions_roles_mods
+
+
+        ]);
     }
 
     /**
