@@ -90,8 +90,8 @@ Route::middleware('auth')->prefix('admin')->group(function () {
     Route::get('users', [App\Http\Controllers\UsersController::class, 'index'])->name('admin.users');
     Route::get('users/getusers', [App\Http\Controllers\UsersController::class, 'GetUsersData'])->name('admin.users.getusers');
     Route::get('users/create', [App\Http\Controllers\UsersController::class, 'create'])->name('admin.users.create');
-    Route::get('users/show/{id}', [App\Http\Controllers\UsersController::class, 'show'])->name('admin.users.show');
-    Route::get('users/edit/{id}', [App\Http\Controllers\UsersController::class, 'edit'])->name('admin.users.edit');
+    Route::get('users/{id}/show', [App\Http\Controllers\UsersController::class, 'show'])->name('admin.users.show');
+    Route::get('users/{id}/edit', [App\Http\Controllers\UsersController::class, 'edit'])->name('admin.users.edit');
     Route::get('users/store', [App\Http\Controllers\UsersController::class, 'store'])->name('admin.users.store');
 });
 

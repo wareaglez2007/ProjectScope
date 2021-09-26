@@ -233,13 +233,13 @@ class UsersController extends Controller
         $groups = Groups::orderby('name', 'ASC')->get();
 
         return view('admin.Modules.Site_Settings.UserManagement.index')->with([
-            'modname' => 'Users Management - Individual view',
+            'modname' => 'Users Management - Edit: '.$rolesusers->name,
             'user_view' => 'edit',
             'user' => $rolesusers,
             'modules' => $modules,
             'permissions' => $permissions,
             'roles' => $roles,
-            '$groups' => $groups,
+            'groups' => $groups,
             'mprs' => $permissions_roles_mods
 
 
