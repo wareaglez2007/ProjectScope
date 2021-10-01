@@ -73,7 +73,7 @@ class RegisterController extends Controller
             'password' => Hash::make($data['password']),
         ]);
         $roles_user = RolesUser::create([
-            'roles_id' => 1,
+            'roles_id' => 19,
             'users_id' => $user->id
         ]);
         return $user;

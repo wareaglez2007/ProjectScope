@@ -9,6 +9,7 @@ use App\Models\Modules;
 use App\Models\Permissions;
 use App\Models\Roles;
 use App\Models\RolesUser;
+use Illuminate\Auth\Events\Validated;
 use \Illuminate\Support\Facades\Route;
 use Illuminate\Foundation\Auth\RegistersUsers;
 use Illuminate\Support\Facades\Hash;
@@ -233,15 +234,14 @@ class UsersController extends Controller
         $groups = Groups::orderby('name', 'ASC')->get();
 
         return view('admin.Modules.Site_Settings.UserManagement.index')->with([
-            'modname' => 'Users Management - Edit: '.$rolesusers->name,
+            'modname' => 'Users Management - Edit: ' . $rolesusers->name,
             'user_view' => 'edit',
             'user' => $rolesusers,
             'modules' => $modules,
             'permissions' => $permissions,
             'roles' => $roles,
             'groups' => $groups,
-            'mprs' => $permissions_roles_mods
-
+            'mprs' => $permissions_roles_mods,
 
         ]);
     }
@@ -255,7 +255,78 @@ class UsersController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        $isValid = false;
+        $rolesusers = User::find($id);
+
+
+      //  dd($request->user_role_select2);
+
+
+        if ($rolesusers->name != $request->name) {
+            $validatedData = $request->validate([
+                'name' => ['required', 'string', 'max:255']
+            ]);
+            if ($validatedData) {
+                $isValid = true;
+            }
+        } else if ($rolesusers->email != $request->email) {
+
+            $validatedData = $request->validate([
+                'email' => ['required', 'string', 'email:rfc,dns', 'max:255', 'unique:users']
+            ]);
+            if ($validatedData) {
+                $isValid = true;
+            }
+        } else if (isset($request->pass)) {
+            //'password' => ['required', 'string', 'min:8', 'confirmed'],
+            $validatedData = $request->validate([
+                'pass' => ['required', 'string', 'min:8']
+            ]);
+            if ($validatedData) {
+                $isValid = true;
+            }
+        } else if (!isset($request->user_role_select2)) {
+            $validatedData = $request->validate([
+                'user_role_select2' => ['required']
+            ]);
+            if ($validatedData) {
+                $isValid = true;
+            }
+        } else if (isset($request->user_role_select2)) {
+
+            foreach ($rolesusers->roles as $userassigned_role) {
+
+                foreach ($request->user_role_select2 as $u_role) {
+                    if ($userassigned_role->id != $u_role) {
+
+                        // $update_role = new RolesUser();
+                        // $update_role->where('users_id', $id)->where('roles_id', $userassigned_role->id)->update([
+                        //     'roles_id' => $u_role
+                        // ]);
+                        // dd($u_role);
+                    }
+                }
+            }
+        }
+
+        if ($isValid) {
+
+            //Update and redirect
+            $update = new User();
+            $update->where('id', $id)->update([
+                'name' => $request->name,
+                'email' => $request->email,
+                'password' => Hash::make($request->pass)
+            ]);
+            //Update Roles Users Table
+
+
+
+            return redirect(route('admin.users.edit', ['id' => $id]))->with('update_response', 'User has been updated!');
+        } else {
+            //dd($request);
+            return redirect(route('admin.users.edit', ['id' => $id]))->with('response', 'There is nothing to update!');
+        }
     }
 
     /**
