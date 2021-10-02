@@ -10,6 +10,7 @@ use App\Models\Permissions;
 use App\Models\Roles;
 use App\Models\RolesUser;
 use Illuminate\Auth\Events\Validated;
+use Illuminate\Contracts\Session\Session;
 use \Illuminate\Support\Facades\Route;
 use Illuminate\Foundation\Auth\RegistersUsers;
 use Illuminate\Support\Facades\Hash;
@@ -72,7 +73,7 @@ class UsersController extends Controller
                 ->get();
 
             $data_arr = array();
-
+            $token = $request->session()->token();
             foreach ($records as $record) {
                 $id = $record->id;
                 $name = $record->name;
@@ -85,6 +86,7 @@ class UsersController extends Controller
                     "email" => $email,
                     "created_at" => $created_at,
                     "actions" => $id,
+                    "token" => $token
 
 
                 );
@@ -257,11 +259,6 @@ class UsersController extends Controller
     {
         $isValid = false;
         $rolesusers = User::find($id);
-
-
-      //  dd($request->user_role_select2);
-
-
         if ($rolesusers->name != $request->name) {
             $validatedData = $request->validate([
                 'name' => ['required', 'string', 'max:255']
@@ -269,7 +266,8 @@ class UsersController extends Controller
             if ($validatedData) {
                 $isValid = true;
             }
-        } else if ($rolesusers->email != $request->email) {
+        }
+        if ($rolesusers->email != $request->email) {
 
             $validatedData = $request->validate([
                 'email' => ['required', 'string', 'email:rfc,dns', 'max:255', 'unique:users']
@@ -277,7 +275,8 @@ class UsersController extends Controller
             if ($validatedData) {
                 $isValid = true;
             }
-        } else if (isset($request->pass)) {
+        }
+        if (isset($request->pass)) {
             //'password' => ['required', 'string', 'min:8', 'confirmed'],
             $validatedData = $request->validate([
                 'pass' => ['required', 'string', 'min:8']
@@ -285,46 +284,62 @@ class UsersController extends Controller
             if ($validatedData) {
                 $isValid = true;
             }
-        } else if (!isset($request->user_role_select2)) {
+        }
+        if (!isset($request->user_role_select2)) {
             $validatedData = $request->validate([
-                'user_role_select2' => ['required']
+                'user_role_select2[]' => ['required']
             ]);
             if ($validatedData) {
                 $isValid = true;
             }
-        } else if (isset($request->user_role_select2)) {
-
-            foreach ($rolesusers->roles as $userassigned_role) {
-
-                foreach ($request->user_role_select2 as $u_role) {
-                    if ($userassigned_role->id != $u_role) {
-
-                        // $update_role = new RolesUser();
-                        // $update_role->where('users_id', $id)->where('roles_id', $userassigned_role->id)->update([
-                        //     'roles_id' => $u_role
-                        // ]);
-                        // dd($u_role);
-                    }
-                }
-            }
         }
 
-        if ($isValid) {
+        $selected = [];
+        $selected = $request->user_role_select2;
+        sort($selected);
+        $assigned_roles_id = [];
+        $checker = [];
+        foreach ($rolesusers->roles as $assigned) {
+            array_push($assigned_roles_id, $assigned->id);
+        }
+        if (count($selected) > count($assigned_roles_id)) {
+            $checker = array_diff($selected, $assigned_roles_id);
+        } else {
+            $checker = array_diff($assigned_roles_id, $selected);
+        }
+        if (is_countable($checker) && count($checker) > 0) {
+            //we have a difference
+            $isValid = true;
+        }
 
+        /******UPDATE OR ADD******/
+        if ($isValid) {
             //Update and redirect
             $update = new User();
-            $update->where('id', $id)->update([
-                'name' => $request->name,
-                'email' => $request->email,
-                'password' => Hash::make($request->pass)
-            ]);
+            if (isset($request->name)) {
+                $update->where('id', $id)->update(['name' => $request->name]);
+            }
+            if (isset($request->email)) {
+                $update->where('id', $id)->update(['email' => $request->email]);
+            }
+            if (isset($request->pass)) {
+                $update->where('id', $id)->update(['password' => Hash::make($request->pass)]);
+            }
+
             //Update Roles Users Table
-
-
-
-            return redirect(route('admin.users.edit', ['id' => $id]))->with('update_response', 'User has been updated!');
+            $update_role = new RolesUser();
+            //Delete all records belonging to the user in RolesUser table
+            $del = $update_role->where('users_id', $id)->forceDelete();
+            foreach ($selected as $u_role) {
+                //It did not find the record
+                //Then add
+                $update_role->create([
+                    'users_id' => $id,
+                    'roles_id' => $u_role
+                ]);
+            }
+            return redirect(route('admin.users.edit', ['id' => $id]))->with('update_response', "User: " . $rolesusers->name . " has been updated.");
         } else {
-            //dd($request);
             return redirect(route('admin.users.edit', ['id' => $id]))->with('response', 'There is nothing to update!');
         }
     }
@@ -335,9 +350,32 @@ class UsersController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy($id, Request $request)
     {
-        //
+        if (isset($request->id)) {
+            //check role
+            $user = User::find($id);
+            $rolechecker = new RolesUser();
+            $is_admin = $rolechecker->where('users_id', $id)->get();
+            foreach ($is_admin as $ad) {
+                if ($ad->roles_id == 1) {
+                    $code = 401;
+                    $response_messages['error'] = "Error: Cannot delete " . $user->name . ". Please try another user. ";
+                } else {
+                    $del = new User();
+                    $do_del =   $del->where('id', $request->id)->forceDelete();
+                    if ($do_del) {
+                        $code = 202;
+                        $response_messages['success'] = $user->name . " has been deleted from database!";
+                    }
+                }
+            }
+
+            return response()->json([
+                "response" => $response_messages,
+                "code" => $code
+            ]);
+        }
     }
 
     /**
