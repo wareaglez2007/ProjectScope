@@ -9,28 +9,10 @@
  */
 $(function () {
 
-    /**
-     * This is ajax pagination control for groups
-     */
-    $(document).on('click', '#groups_default_pagination .pagination a', function (event) {
-        event.preventDefault();
-        var group_status = $("#group_status").val();
-        var page = $(this).attr('href').split('page=')[1];
-
-        fetch_data(page, group_status);
-    });
 
 
-    /**
-     * This is ajax pagination control for roles in the groups section
-     */
-    $(document).on('click', '#groups_roles_show_pagination .pagination a', function (event) {
-        event.preventDefault();
-        var gp_id = $("#use_for_group_id").val();
-        var page = $(this).attr('href').split('page=')[1];
 
-        fetch_role_data(page, gp_id);
-    });
+
 
 
 }); //END of DOM ON READY <<-------------------
@@ -102,7 +84,7 @@ function fetch_data(page, status) {
     console.log(status);
     var url = "";
 
-        url = "/admin/groups/groupspagination?page=" + page+"&status="+status;
+    url = "/admin/groups/groupspagination?page=" + page + "&status=" + status;
 
     $.ajax({
         url: url,
@@ -150,7 +132,7 @@ function groupsearch() {
         //cache: false,
         data: {
             search_q: search_q,
-            status : group_status
+            status: group_status
 
         },
         success: function (data) {
@@ -367,7 +349,7 @@ function DestoryGroup(group_id) {
     var groups_per_page = $('#groups_per_page_count').val();
     var groups_last_page = $("#groups_last_page").val();
     var group_status = $("#group_status").val();
-    if((current_page == groups_last_page) && groups_per_page == 1){
+    if ((current_page == groups_last_page) && groups_per_page == 1) {
         current_page = 1; //end of the line
     }
     $.ajaxSetup({
@@ -380,7 +362,7 @@ function DestoryGroup(group_id) {
 
     }); //End of ajax setup
     $.ajax({
-        url: '/admin/groups/destroy?page=' + current_page+"&status="+group_status,
+        url: '/admin/groups/destroy?page=' + current_page + "&status=" + group_status,
         method: "post",
         //cache: false,
         data: {
@@ -427,12 +409,12 @@ function DestoryGroup(group_id) {
  * @controller delete
  * @returns Blade view: GroupsManagement.partials.groupspagination
  */
- function DeleteGroup(group_id) {
+function DeleteGroup(group_id) {
     var current_page = $("#groups_current_page").val();
     var groups_per_page = $('#groups_per_page_count').val();
     var groups_last_page = $("#groups_last_page").val();
     var group_status = $("#group_status").val();
-    if((current_page == groups_last_page) && groups_per_page == 1){
+    if ((current_page == groups_last_page) && groups_per_page == 1) {
         current_page = 1; //end of the line
     }
     $.ajaxSetup({
@@ -445,7 +427,7 @@ function DestoryGroup(group_id) {
 
     }); //End of ajax setup
     $.ajax({
-        url: '/admin/groups/delete?page=' + current_page+"&status="+group_status,
+        url: '/admin/groups/delete?page=' + current_page + "&status=" + group_status,
         method: "post",
         //cache: false,
         data: {
@@ -492,12 +474,12 @@ function DestoryGroup(group_id) {
  * @controller activate
  * @returns Blade view: GroupsManagement.partials.groupspagination
  */
- function ActivateGroup(group_id) {
+function ActivateGroup(group_id) {
     var current_page = $("#groups_current_page").val();
     var groups_per_page = $('#groups_per_page_count').val();
     var groups_last_page = $("#groups_last_page").val();
     var group_status = $("#group_status").val();
-    if((current_page == groups_last_page) && groups_per_page == 1){
+    if ((current_page == groups_last_page) && groups_per_page == 1) {
         current_page = 1; //end of the line
     }
     $.ajaxSetup({
@@ -510,7 +492,7 @@ function DestoryGroup(group_id) {
 
     }); //End of ajax setup
     $.ajax({
-        url: '/admin/groups/activate?page=' + current_page+"&status="+group_status,
+        url: '/admin/groups/activate?page=' + current_page + "&status=" + group_status,
         method: "post",
         //cache: false,
         data: {
@@ -549,3 +531,144 @@ function DestoryGroup(group_id) {
         } //end of error
     }); //end of ajax
 }
+
+
+
+/**
+ * This function submits data to update the groups and roles table
+ * 10-04-2021
+ */
+function updategroup(group_id) {
+
+    var gname = $("#gp_name").val();
+    var select_data = $('#groups_table_roles').DataTable();
+    var selected_role_ids = $.map(select_data.rows('.selected').data(), function (item) {
+        return item[0]
+    });
+
+    $.ajaxSetup({
+        headers: {
+            'X-CSRF-TOKEN': $(
+                'meta[name="csrf-token"]')
+                .attr(
+                    'content')
+        }
+
+    }); //End of ajax setup
+    $.ajax({
+        url: '/admin/groups/' + group_id + '/update',
+        method: "post",
+        cache: false,
+        data: {
+            id: group_id,
+            roles_id: selected_role_ids,
+            name: gname
+        },
+        success: function (data) {
+            if (typeof data.response.error != 'undefined') {
+                var toast_message = '<ul>';
+                var uid = getRandomInt(100);
+                $.each(data.response.error, function (err_index, error_val) {
+                    toastcolor = "#dc3545";
+                    toast_message += '<li >' + error_val + '</li>';
+                });
+                toast_message += '</ul>';
+                HandleAjaxResponsesToast(2500, toastcolor, uid, toast_message, 200);
+            }
+            if (typeof data.response.success != 'undefined') {
+                var toast_message = '<ul>';
+                var uid = getRandomInt(100);
+                $.each(data.response.success, function (succ_index, success_val) {
+                    toastcolor = "#04AA6D";
+                    toast_message += '<li>' + success_val + '</li>';
+                });
+                toast_message += '</ul>';
+                HandleAjaxResponsesToast(2500, toastcolor, uid, toast_message, 200);
+
+            }
+        }, //end of success
+        error: function (error) {
+
+            if (typeof error.responseJSON.message != 'undefined') {
+                toastcolor = "#dc3545";
+                toast_message = error.responseJSON.message;
+
+                //HandleAjaxResponsesToast(1050, toastcolor, mess_count, toast_message, 422);
+
+                $.each(error.responseJSON.errors, function (index, val) {
+                    HandleAjaxResponsesToast(2300, toastcolor, index, val, error.status);
+
+                });
+            }
+
+        } //end of error
+    }); //end of ajax
+
+
+}
+// $('#do_update_gr').on('submit', function (e) {
+//     console.log('click');
+//     var group_id = $("#gp_id").val();
+//     var gname = $("#gp_name").val();
+//     e.preventDefault();
+//     var select_data = $('#groups_table_roles').DataTable();
+//     var selected_role_ids = $.map(select_data.rows('.selected').data(), function (item) {
+//         return item[0]
+//     });
+
+//     $.ajaxSetup({
+//         headers: {
+//             'X-CSRF-TOKEN': $(
+//                 'meta[name="csrf-token"]')
+//                 .attr(
+//                     'content')
+//         }
+
+//     }); //End of ajax setup
+//     $.ajax({
+//         url: '/admin/groups/' + group_id + '/update',
+//         method: "post",
+//         //cache: false,
+//         data: {
+//             id: group_id,
+//             roles_id: selected_role_ids,
+//             name: gname
+//         },
+//         success: function (data) {
+//             var toastcolor = "";
+//             var toast_message = "";
+//             if (typeof data != 'undefined') {
+//                 $('#do_update_gr').html(data.view);
+
+//                 if (typeof data.response.error != 'undefined') {
+//                     toastcolor = "#dc3545";
+//                     toast_message = data.response.error;
+//                 } else {
+//                     toastcolor = "#04AA6D";
+//                     toast_message = data.response.success;
+//                 }
+//                 HandleAjaxResponsesToast(1050, toastcolor, 1, toast_message, 200);
+//             }
+//         }, //end of success
+//         error: function (error) {
+
+//             if (typeof error.responseJSON.message != 'undefined') {
+//                 toastcolor = "#dc3545";
+//                 toast_message = error.responseJSON.message;
+
+//                 //HandleAjaxResponsesToast(1050, toastcolor, mess_count, toast_message, 422);
+
+//                 $.each(error.responseJSON.errors, function (index, val) {
+//                     HandleAjaxResponsesToast(2300, toastcolor, index, val, error.status);
+
+//                 });
+//             }
+
+//         } //end of error
+//     }); //end of ajax
+
+
+
+//     //console.log(dataArr);
+
+// });

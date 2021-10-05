@@ -14,6 +14,8 @@ try {
     //jquery datatables 09-12-2021
     //From: https://dev.to/dendihandian/adding-datatable-to-laravel-the-laravel-mix-way-2fhi
     require('datatables.net-bs4');
+    //10/03/2021 Datatables select
+    require('datatables.net-select-bs4');
     //RS added below on 08-31-2021
     //From: https://dev.to/dendihandian/adding-select2-to-laravel-the-laravel-mix-way-4285
     require('select2');

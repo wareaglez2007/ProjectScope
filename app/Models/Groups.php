@@ -76,4 +76,14 @@ class Groups extends Model
     {
         return $this->hasMany(GroupsRoles::class);
     }
+
+
+
+    /**
+     * this will return all the roles assigned to a user
+     */
+    public function groles()
+    {
+        return $this->belongsToMany(Roles::class, 'groups_roles', 'groups_id')->orderby('id', 'ASC');
+    }
 }

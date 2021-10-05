@@ -42,25 +42,16 @@ Route::middleware('auth')->prefix('admin')->group(function () {
      * Group Controller
      */
     Route::get('groups', [App\Http\Controllers\GroupsController::class, 'index'])->name('admin.groups');
+    Route::get('groups/getgroups', [App\Http\Controllers\GroupsController::class, 'GetGroupsData'])->name('admin.groups.getgroups');
     Route::get('groups/create', [App\Http\Controllers\GroupsController::class, 'create'])->name('admin.groups.create');
     Route::post('groups/store', [App\Http\Controllers\GroupsController::class, 'store'])->name('admin.groups.store');
-    Route::get('groups/update', [App\Http\Controllers\GroupsController::class, 'update'])->name('admin.groups.update');
-    Route::get('groups/show/{id}', [App\Http\Controllers\GroupsController::class, 'show'])->name('admin.groups.show');
-    Route::get('groups/groupspagination', [App\Http\Controllers\GroupsController::class, 'GroupsAjaxPaginationdata']);
-    Route::post('groups/search', [App\Http\Controllers\GroupsController::class, 'search']);
-    Route::post('groups/search/roles', [App\Http\Controllers\GroupsController::class, 'searchRoles']);
-    //groupsrolespagination
-    Route::get('groups/show/{id}/groupsrolespagination', [App\Http\Controllers\GroupsController::class, 'GroupsRolesAjaxPaginationdata']);
-    //Select 2
-    Route::get('groups/show/{id}/rolesupdate', [App\Http\Controllers\GroupsController::class, 'updatewithSelect2']);
-    //Group name update = '/admin/groups/show/'+group_id+'/updategroup
-    Route::get('groups/show/{id}/updategroup', [App\Http\Controllers\GroupsController::class, 'updateGroupName']);
-    //Destroy
-    Route::post('groups/destroy', [App\Http\Controllers\GroupsController::class, 'destroy'])->name('admin.groups.destroy');
-    //Delete
-    Route::post('groups/delete', [App\Http\Controllers\GroupsController::class, 'delete'])->name('admin.groups.delete');
-    //Activate
-    Route::post('groups/activate', [App\Http\Controllers\GroupsController::class, 'activate'])->name('admin.groups.activate');
+    Route::post('groups/{id}/update', [App\Http\Controllers\GroupsController::class, 'update'])->name('admin.groups.update');
+    Route::get('groups/{id}/show', [App\Http\Controllers\GroupsController::class, 'show'])->name('admin.groups.show');
+    Route::get('groups/{id}/edit', [App\Http\Controllers\GroupsController::class, 'edit'])->name('admin.groups.edit');
+    Route::post('groups/{id}/destroy', [App\Http\Controllers\GroupsController::class, 'destroy'])->name('admin.groups.destroy');
+
+
+
     /**
      * Roles Controller
      */

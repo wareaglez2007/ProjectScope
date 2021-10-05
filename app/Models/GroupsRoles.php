@@ -9,7 +9,17 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 class GroupsRoles extends Model
 {
     use HasFactory;
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var array
+     */
+    protected $fillable = [
+        'groups_id',
+        'roles_id',
+        'users_id',
+        'updated_at'
+    ];
 
 
-  
 }
