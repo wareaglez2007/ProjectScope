@@ -218,12 +218,8 @@ class GroupsController extends Controller
     public function update(Request $request, GroupsRoles $groupsRoles, Groups $groups, $id)
     {
         $group = $groups->find($request->id);
-        $isvalid = false;
-        $do_updates = false;
-        $nothing_to_update = false;
         $response_messages = [];
 
-        //dd($request);
 
         if ($group->name != $request->name) {
             //validate
@@ -264,10 +260,6 @@ class GroupsController extends Controller
                 //1. compare assigned roles to selected roles 1st
                 //In this case if there are any role ids that are not in selected will pop
                 $assigned_vs_selected = array_diff($assigned_roles_array, $request->roles_id);
-                //if the return array is empty then that means no changes
-                //2. compare selected roles to assigned  roles
-                $selected_vs_assigned = array_diff($request->roles_id, $assigned_roles_array);
-
                 if (is_countable($assigned_vs_selected) && count($assigned_vs_selected)) {
                     //if the return array has anything that means the assigned values need to be removed
                     $response = array();
@@ -276,10 +268,11 @@ class GroupsController extends Controller
                         $response[] = $group->name . " roles have been updated. Role ID: " . $rid . " has been removed.";
                         $response_messages['error'] = $response;
                     }
-                } else {
-                    $nothing_to_update = true;
                 }
 
+                //if the return array is empty then that means no changes
+                //2. compare selected roles to assigned  roles
+                $selected_vs_assigned = array_diff($request->roles_id, $assigned_roles_array);
                 if (is_countable($selected_vs_assigned) && count($selected_vs_assigned) > 0) {
                     //if there is a diff that means the user added more item
                     $response = array();
@@ -295,9 +288,6 @@ class GroupsController extends Controller
                         $response[] = $group->name . " roles have been updated. Role ID: " . $sid . " has been added.";
                         $response_messages['success'] = $response;
                     }
-                } else {
-                    $nothing_to_update = true;
-
                 }
             } else {
                 //3. there are no records of the group having roles assigned
@@ -325,11 +315,7 @@ class GroupsController extends Controller
             $response_messages['error'] = $response;
         }
 
-        if($nothing_to_update){
-             //$response = array();
-             $response[] = "There is nothing to update for " . $group->name;
-             $response_messages['default'] = $response;
-        }
+
         /*******************/
         //End of scenario for roles
         /******************/
