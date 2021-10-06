@@ -1,3 +1,4 @@
+<div id="do_edit_groups_role">
 {{-- Groups infor section --}}
 <form id="do_update_gr" method="post" action="{{ route('admin.groups.update', ['id' => $group->id]) }}">
     @csrf
@@ -94,3 +95,5 @@
 
     }); //END of DOM ON READY <<-------------------
 </script>
+</div>
+

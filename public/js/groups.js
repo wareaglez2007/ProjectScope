@@ -586,6 +586,19 @@ function updategroup(group_id) {
                 HandleAjaxResponsesToast(2500, toastcolor, uid, toast_message, 200);
 
             }
+            //Warnings
+            if (typeof data.response.warning != 'undefined') {
+                var toast_message = '<ul>';
+                var uid = getRandomInt(100);
+                $.each(data.response.warning, function (err_index, error_val) {
+                    toastcolor = "#ffc107";
+                    toast_message += '<li >' + error_val + '</li>';
+                });
+                toast_message += '</ul>';
+                HandleAjaxResponsesToast(2500, toastcolor, uid, toast_message, 200);
+            }
+            $('#do_edit_groups_role').html(data.view);
+
         }, //end of success
         error: function (error) {
 

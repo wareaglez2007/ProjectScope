@@ -260,33 +260,45 @@ class GroupsController extends Controller
                 //1. compare assigned roles to selected roles 1st
                 //In this case if there are any role ids that are not in selected will pop
                 $assigned_vs_selected = array_diff($assigned_roles_array, $request->roles_id);
-                if (is_countable($assigned_vs_selected) && count($assigned_vs_selected)) {
-                    //if the return array has anything that means the assigned values need to be removed
-                    $response = array();
-                    foreach ($assigned_vs_selected as $rid) {
-                        $remove_old_roles = $groupsRoles->where('groups_id', $request->id)->where('roles_id', $rid)->forceDelete();
-                        $response[] = $group->name . " roles have been updated. Role ID: " . $rid . " has been removed.";
-                        $response_messages['error'] = $response;
-                    }
-                }
-
                 //if the return array is empty then that means no changes
                 //2. compare selected roles to assigned  roles
                 $selected_vs_assigned = array_diff($request->roles_id, $assigned_roles_array);
-                if (is_countable($selected_vs_assigned) && count($selected_vs_assigned) > 0) {
-                    //if there is a diff that means the user added more item
-                    $response = array();
-                    foreach ($selected_vs_assigned as $sid) {
-                        $add_new = new GroupsRoles();
-                        $update_group_roles = $add_new->create([
-                            'groups_id' => $id,
-                            'roles_id' => $sid,
-                            'users_id' => auth()->id(),
-                            'updated_at' => now(),
 
-                        ]);
-                        $response[] = $group->name . " roles have been updated. Role ID: " . $sid . " has been added.";
-                        $response_messages['success'] = $response;
+                if (is_countable($assigned_vs_selected) && is_countable($selected_vs_assigned)) {
+
+                    if (count($assigned_vs_selected) > 0) {
+                        // dump(count($assigned_vs_selected));
+                        //if the return array has anything that means the assigned values need to be removed
+                        $response = array();
+                        foreach ($assigned_vs_selected as $rid) {
+                            $remove_old_roles = $groupsRoles->where('groups_id', $request->id)->where('roles_id', $rid)->forceDelete();
+
+                            $response[] = $group->name . " roles have been updated. Role ID: " . $rid . " has been removed.";
+                            // unset($response_messages);
+                            $response_messages['error'] = $response;
+                        }
+                    }
+
+                    if (count($selected_vs_assigned) > 0) {
+                        //if there is a diff that means the user added more item
+                        $response = array();
+                        foreach ($selected_vs_assigned as $sid) {
+                            $add_new = new GroupsRoles();
+                            $update_group_roles = $add_new->create([
+                                'groups_id' => $id,
+                                'roles_id' => $sid,
+                                'users_id' => auth()->id(),
+                                'updated_at' => now(),
+
+                            ]);
+                            $response[] = $group->name . " roles have been updated. Role ID: " . $sid . " has been added.";
+                            $response_messages['success'] = $response;
+                        }
+                    }
+
+                    //IF THE ARRAY DIFF FOR BOTH INSTANCES IS ZERO, THEN WE HAVE NOTHING TO UPDATE
+                    if (count($assigned_vs_selected) == 0 && count($selected_vs_assigned) == 0) {
+                        $response_messages['warning'] = ["There are no roles to be updated for " . $group->name . '.'];
                     }
                 }
             } else {
@@ -314,6 +326,7 @@ class GroupsController extends Controller
             $response[] = $group->name . "'s roles have been removed from our records.";
             $response_messages['error'] = $response;
         }
+
 
 
         /*******************/
