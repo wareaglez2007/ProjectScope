@@ -32,9 +32,10 @@ $(function () {
 
                 },
                 {
-                    targets: [2],
+                    targets: [2], //Roles count
                     orderable: false,
                 },
+
             ],
 
 
