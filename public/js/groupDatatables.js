@@ -1,4 +1,5 @@
 $(function () {
+  /** Bootstrap popover 09-08-2021 */
 
     $('#groups_table').DataTable({
         processing: true,
@@ -10,7 +11,7 @@ $(function () {
         columns: [
             { data: 'id' },
             { data: 'name' },
-            { data: 'roles count' },
+            { data: 'roles_count' },
             { data: 'updated_at' },
             { data: 'actions' },
 
@@ -34,7 +35,22 @@ $(function () {
                 {
                     targets: [2], //Roles count
                     orderable: false,
+
                 },
+                {
+                    targets: [1],
+                    render: function(data, type, row){
+
+                        if(row.roles_count == 0){
+                            var attention = row.name+' &nbsp;<i class="bi bi-exclamation-circle-fill text-warning" data-toggle="tooltip" data-placement="right" title="Attention! No roles have been assigned to this group!"></i>';
+                            return attention;
+                        }else{
+                            return row.name;
+                        }
+
+
+                    },
+                }
 
             ],
 
@@ -44,8 +60,9 @@ $(function () {
 
 
 
-
-
+    //10-08-2021 found this for tooltips that dont work.
+    //From: https://stackoverflow.com/questions/9446318/bootstrap-tooltips-not-working
+    $("body").tooltip({ selector: '[data-toggle=tooltip]' });
 
 
 

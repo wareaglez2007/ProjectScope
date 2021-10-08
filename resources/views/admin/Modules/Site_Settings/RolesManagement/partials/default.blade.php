@@ -31,12 +31,12 @@
                     @endphp
 
                     <tr>
-                        <td scope="row" class="text-muted">
+                        <td scope="row" class="">
                             {{ $role->id }}</td>
-                        <td class="text-muted">
+                        <td class="">
                                 {{ $role->name }}</a> &nbsp;{!! $attention !!}&nbsp;
                         </td>
-                        <td class="text-muted">{{ $role->created_at }}</td>
+                        <td class="">{{ $role->created_at }}</td>
                         <td style="text-align:center">
                             {{-- <div class="btn-group" role="group" aria-label="Basic example"> --}}
                                 <a href="{{ route('admin.roles.show', ['id' => $role->id]) }}"  class="btn btn-info btn-sm">View</a>

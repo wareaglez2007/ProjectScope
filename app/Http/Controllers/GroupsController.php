@@ -95,7 +95,7 @@ class GroupsController extends Controller
                 $data_arr[] = array(
                     "id" => $id,
                     "name" => $name,
-                    "roles count" => $roles_count,
+                    "roles_count" => $roles_count,
                     "updated_at" => $updated_at,
                     "actions" => $id,
                     "token" => $token

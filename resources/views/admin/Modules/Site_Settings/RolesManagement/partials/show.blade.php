@@ -1,4 +1,4 @@
-<table class="table table-bordered table-hover table-sm">
+<table class="table table-striped table-inverse">
     <thead>
         <tr>
             <th>Group Id</th>
