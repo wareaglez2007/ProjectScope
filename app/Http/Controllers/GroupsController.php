@@ -168,21 +168,19 @@ class GroupsController extends Controller
      */
     public function show($id)
     {
-        $this->setGroup_id($id);
-        $group = Groups::withTrashed()->findorfail($id);
-        $roles_assigned = $this->groups->withTrashed()->find($id)->Roles()->get();
-        $roles_count = GroupsRoles::count();
-        $roles = Roles::orderby('name', 'ASC')->paginate(8);
-        $roles_2 = Roles::orderby('name', 'ASC')->get();
+         //Will need the group onfo
+        //will need the roles assigned to group
+        //will need the list of roles
+        $group = Groups::find($id);
+        $roles = Roles::orderby('name', 'ASC')->get();
+
+        //dd($roles);
         return view('admin.Modules.Site_Settings.GroupsManagement.index')->with([
-            'modname' => 'Gruop Management - Individual Group View',
-            'count' => $this->groups->GetGroupCount(),
+            'modname' => 'Show - Group(s) | ' . $group->name . ' on view mode.',
+            'group_view' => 'show',
             'group' => $group,
-            'id' => $id,
             'roles' => $roles,
-            'roles2' => $roles_2,
-            'roles_assigned' => $roles_assigned,
-            'roles_count' => $roles_count
+            //'selected' => 0
         ]);
     }
 
