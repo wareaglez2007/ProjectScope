@@ -46,5 +46,12 @@ class Roles extends Model
         return $this->belongsTo(ModulesPermissionsRoles::class, 'id', 'roles_id');
     }
 
+      /**
+     * this will return all the roles assigned to a user
+     */
+    public function rgroups()
+    {
+        return $this->belongsTo(Groups::class, 'groups_roles', 'roles_id')->orderby('id', 'ASC');
+    }
 
 }

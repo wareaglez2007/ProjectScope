@@ -24,49 +24,47 @@
                 </tr>
             </tbody>
         </table>
-        {{-- @dump($group->groles); --}}
 
         {{-- Show roles at this section --}}
-        <table class="table table-bordered table-striped table-hover table-sm" id="groups_table_roles"
-            style="width: 100%">
-            <thead>
-                <tr>
-                    <th>Id</th>
-                    <th>Role Name</th>
-                    <th>Updated At</th>
-                    <th>is_selected</th>
+        @if (is_countable($roles) && count($roles) > 0)
+            <table class="table table-bordered table-striped table-hover table-sm" id="groups_table_roles"
+                style="width: 100%">
+                <thead>
+                    <tr>
+                        <th>Id</th>
+                        <th>Role Name</th>
+                        <th>Updated At</th>
+                        <th>is_selected</th>
 
-                </tr>
-            </thead>
-            <tbody>
-                @if (is_countable($roles) && count($roles) > 0)
-
+                    </tr>
+                </thead>
+                <tbody>
                     @foreach ($roles as $role)
-                        @if (is_countable($group->groles) && count($group->groles) > 0)
-                            @php
-                                foreach ($group->groles as $rg) {
-                                    if ($role->id == $rg->id) {
-                                        $selected = 1;
-                                    } else {
-                                        $selected = 0;
-                                    }
-                                }
-                            @endphp
-                        @endif
                         <tr>
                             <td>{{ $role->id }}</td>
                             <td>{{ $role->name }}</td>
                             <td>{{ $role->updated_at }}</td>
-                            <td>{{ $selected }}</td>
+                            <td>
+                                @foreach ($group->groles as $rga)
+                                    @php
+                                        $selected = 0;
+
+                                        if ($role->id == $rga->id) {
+                                            $selected = 1;
+                                        } else {
+                                            $selected = null;
+                                        }
+                                        echo $selected;
+                                    @endphp
+                                @endforeach
+                            </td>
                         </tr>
                     @endforeach
-
-                @else
-                        <td>No data is available!</td>
-                @endif
-            </tbody>
-        </table>
-
+                </tbody>
+            </table>
+        @else
+            <p>No data is available!</p>
+        @endif
     </form>
 
     @if (is_countable($group->groles) && count($group->groles) > 0)
@@ -92,17 +90,19 @@
                 select: {
                     style: 'multi'
                 },
+                order: [
+                    [3, 'desc']
+                ], // sort the default to selected rows
                 columnDefs: [{
                         targets: [3], //Hides the column
                         visible: false,
                         searchable: false,
-
+                        //orderData: [3,1]
                     },
 
                 ],
-                order: [
-                    [3, 'desc']
-                ] // sort the default to selected rows
+
+
             });
             //Preselected the rows that have already been assigned to the group
             //10-04-2021

@@ -199,12 +199,14 @@ class GroupsController extends Controller
         //will need the list of roles
         $group = Groups::find($id);
         $roles = Roles::orderby('name', 'ASC')->get();
+
+        //dd($roles);
         return view('admin.Modules.Site_Settings.GroupsManagement.index')->with([
             'modname' => 'Edit - Group(s) | ' . $group->name . ' on edit mode.',
             'group_view' => 'edit',
             'group' => $group,
             'roles' => $roles,
-            'selected' => ''
+            //'selected' => 0
         ]);
     }
 
