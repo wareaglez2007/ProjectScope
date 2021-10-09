@@ -468,69 +468,6 @@ function DeleteGroup(group_id) {
 }
 
 
-/**
- * 09-02-2021
- * @param int group_id
- * @controller activate
- * @returns Blade view: GroupsManagement.partials.groupspagination
- */
-function ActivateGroup(group_id) {
-    var current_page = $("#groups_current_page").val();
-    var groups_per_page = $('#groups_per_page_count').val();
-    var groups_last_page = $("#groups_last_page").val();
-    var group_status = $("#group_status").val();
-    if ((current_page == groups_last_page) && groups_per_page == 1) {
-        current_page = 1; //end of the line
-    }
-    $.ajaxSetup({
-        headers: {
-            'X-CSRF-TOKEN': $(
-                'meta[name="csrf-token"]')
-                .attr(
-                    'content')
-        }
-
-    }); //End of ajax setup
-    $.ajax({
-        url: '/admin/groups/activate?page=' + current_page + "&status=" + group_status,
-        method: "post",
-        //cache: false,
-        data: {
-            id: group_id
-        },
-        success: function (data) {
-            var toastcolor = "";
-            var toast_message = "";
-            if (typeof data != 'undefined') {
-                $('#groups_data').html(data.view);
-
-                if (typeof data.response.error != 'undefined') {
-                    toastcolor = "#dc3545";
-                    toast_message = data.response.error;
-                } else {
-                    toastcolor = "#04AA6D";
-                    toast_message = data.response.success;
-                }
-                HandleAjaxResponsesToast(1050, toastcolor, 1, toast_message, 200);
-            }
-        }, //end of success
-        error: function (error) {
-
-            if (typeof error.responseJSON.message != 'undefined') {
-                toastcolor = "#dc3545";
-                toast_message = error.responseJSON.message;
-
-                //HandleAjaxResponsesToast(1050, toastcolor, mess_count, toast_message, 422);
-
-                $.each(error.responseJSON.errors, function (index, val) {
-                    HandleAjaxResponsesToast(2300, toastcolor, index, val, error.status);
-
-                });
-            }
-
-        } //end of error
-    }); //end of ajax
-}
 
 
 

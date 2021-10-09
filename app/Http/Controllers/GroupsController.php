@@ -204,7 +204,7 @@ class GroupsController extends Controller
             'group_view' => 'edit',
             'group' => $group,
             'roles' => $roles,
-            //'selected' => 0
+            'selected' => null
         ]);
     }
 
@@ -356,28 +356,27 @@ class GroupsController extends Controller
      * @param  Request $request
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Request $request)
+    public function destroy(Request $request, $id)
     {
-        if ($request->id != null) {
-            if ($request->id != Groups::ADMIN_GROUP) {
-                $this->groups->where('id', $request->id)->whereNotIn('id',  [Groups::ADMIN_GROUP])->delete();
-                $response_messages['success'] = "Group has been deativated!";
-            } else {
-                $response_messages['error'] = "You cannot deativate this group";
+        if (isset($request->id)) {
+            //check group
+            $group = Groups::find($id);
+            if(strtolower(trim($group->name)) == "admin" || strtolower(trim($group->name)) == "users"){
+                    $code = 403;
+                    $response_messages['error'] = "Error: Cannot delete " . $group->name . ". Please try another group. ";
+            }else{
+
+                $del = new Groups();
+                $do_del = $del->where('id', $request->id)->forceDelete();
+                if ($do_del) {
+                    $code = 202;
+                    $response_messages['success'] = $group->name . " has been deleted from database!";
+                }
             }
-            $gp = $this->groups->all();
-            if ($request->ajax()) {
-                return response()->json([
-                    "response" => $response_messages,
-                    'modname' => 'Group Management',
-                    'view' => view('admin.Modules.Site_Settings.GroupsManagement.partials.groupspagination')->with([
-                        'modname' => 'Gruop Management',
-                        'count' => $this->groups->GetGroupCount(),
-                        'groups' => $this->groups->GetAllGroups(null, true, 6, 'name', 'ASC'),
-                        'roles_count' => $gp,
-                    ])->render()
-                ]);
-            }
+            return response()->json([
+                "response" => $response_messages,
+                "code" => $code
+            ]);
         }
     }
 

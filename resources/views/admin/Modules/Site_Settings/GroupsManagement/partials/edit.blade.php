@@ -47,16 +47,15 @@
                             <td>
                                 @foreach ($group->groles as $rga)
                                     @php
-                                        $selected = 0;
-
                                         if ($role->id == $rga->id) {
                                             $selected = 1;
                                         } else {
                                             $selected = null;
                                         }
-                                        echo $selected;
                                     @endphp
+                                     {{ $selected }}
                                 @endforeach
+
                             </td>
                         </tr>
                     @endforeach

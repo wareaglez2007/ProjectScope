@@ -77,7 +77,7 @@ function confirm(id) {
                     location.reload();
                 }
 
-                HandleAjaxResponsesToast(500000, toastcolor, uid, toast_message, 200);
+                HandleAjaxResponsesToast(2200, toastcolor, uid, toast_message, 200);
             }
         }, //end of success
         error: function (error) {

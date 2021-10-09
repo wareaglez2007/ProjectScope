@@ -84,7 +84,7 @@ function confirm(id) {
 
         }); //End of ajax setup
         $.ajax({
-            url: "/admin/users/" + id + "/destroy",
+            url: "/admin/groups/" + id + "/destroy",
             method: "post",
             cache: false,
             data: {
@@ -106,10 +106,21 @@ function confirm(id) {
                         toast_message = data.response.success;
                     }
                     if (data.code == 202) {
-                        location.reload();
+                        setTimeout(() => {
+                            location.reload();
+                            $('#confirmdestroygroup').modal('hide');
+
+                        }, 1000);
+
+                    }else{
+                        HandleAjaxResponsesToast(2200, toastcolor, uid, toast_message, 200);
+                        setTimeout(() => {
+                            $('#confirmdestroygroup').modal('hide');
+
+                        }, 1000);
                     }
 
-                    HandleAjaxResponsesToast(500000, toastcolor, uid, toast_message, 200);
+
                 }
             }, //end of success
             error: function (error) {
@@ -121,6 +132,7 @@ function confirm(id) {
                     //  HandleAjaxResponsesToast(2300, toastcolor, 1, toast_message, 422);
 
                     $.each(error.responseJSON.errors, function (index, val) {
+
                         HandleAjaxResponsesToast(2300, toastcolor, index, val, error.status);
 
                     });
