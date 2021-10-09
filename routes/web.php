@@ -68,6 +68,8 @@ Route::middleware('auth')->prefix('admin')->group(function () {
     Route::get('permissions', [App\Http\Controllers\PermissionsController::class, 'index'])->name('admin.permissions');
     Route::get('permissions/create', [App\Http\Controllers\PermissionsController::class, 'create'])->name('admin.permissions.create');
     Route::get('permissions/update', [App\Http\Controllers\PermissionsController::class, 'update'])->name('admin.permissions.update');
+    Route::get('permissions/getpermissions', [App\Http\Controllers\PermissionsController::class, 'GetPermissionsData'])->name('admin.permissions.getpermissions');
+
     /**
      * Module Controller
      */
