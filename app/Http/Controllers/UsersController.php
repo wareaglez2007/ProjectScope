@@ -41,6 +41,7 @@ class UsersController extends Controller
     public function GetUsersData(Request $request)
     {
         if ($request->exists('draw')) {
+
             ## Read value
             $draw = $request->draw;
             $start = $request->start;
@@ -63,22 +64,41 @@ class UsersController extends Controller
                 ->where('name', 'like', '%' . $searchValue . '%')
                 ->orwhere('email', 'like', '%' . $searchValue . '%')
                 ->count();
-
-            // Fetch records
-            $records = User::orderBy($columnName, $columnSortOrder)
-                ->where('name', 'like', '%' . $searchValue . '%')
-                ->orwhere('email', 'like', '%' . $searchValue . '%')
+                // Fetch records
+            if($columnName == 'roles_assigned'){
+                $columnName = 'roles.name';
+                $records = User::join('roles_users', 'roles_users.users_id', '=', 'users.id')
+                ->join('roles', 'roles.id', '=', 'roles_users.roles_id')
                 ->skip($start)
                 ->take($rowperpage)
-                ->get();
+                ->orderBy($columnName, $columnSortOrder)
+                ->where('roles.name', 'like', '%' . $searchValue . '%')
+                ->orwhere('users.name', 'like', '%' . $searchValue . '%')
+                ->orwhere('users.email', 'like', '%' . $searchValue . '%')
+                ->get(['users.*', 'roles.name as rolename', 'roles.id as roleid']);
+            }else{
+                $records = User::orderBy('users.'.$columnName, $columnSortOrder)
+                ->join('roles_users', 'roles_users.users_id', '=', 'users.id')
+                ->join('roles', 'roles.id', '=', 'roles_users.roles_id')
+                ->where('roles.name', 'like', '%' . $searchValue . '%')
+                ->orwhere('users.name', 'like', '%' . $searchValue . '%')
+                ->orwhere('users.email', 'like', '%' . $searchValue . '%')
+                ->skip($start)
+                ->take($rowperpage)
+                ->get(['users.*', 'roles.name as rolename', 'roles.id as roleid']);
+
+            }
 
             $data_arr = array();
             $token = $request->session()->token();
+
             foreach ($records as $record) {
                 $id = $record->id;
                 $name = $record->name;
                 $email = $record->email;
                 $created_at = date('m-d-Y @ H:i:s', strtotime($record->created_at));
+
+                $roles_assigned = User::find($id)->roles;
 
                 $data_arr[] = array(
                     "id" => $id,
@@ -86,7 +106,8 @@ class UsersController extends Controller
                     "email" => $email,
                     "created_at" => $created_at,
                     "actions" => $id,
-                    "token" => $token
+                    "token" => $token,
+                    "roles_assigned" => $roles_assigned
 
 
                 );
@@ -98,7 +119,6 @@ class UsersController extends Controller
                 "iTotalDisplayRecords" => $totalRecordswithFilter,
                 "aaData" => $data_arr
             );
-
             return response()->json($response);
         }
     }

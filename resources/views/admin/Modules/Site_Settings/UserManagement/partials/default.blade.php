@@ -4,8 +4,10 @@
                <th>Id</th>
                <th>Name</th>
                <th>Email</th>
+               <th>Role(s)</th>
                <th>Created_at</th>
                <th></th>
+
            </tr>
        </thead>
    </table>
