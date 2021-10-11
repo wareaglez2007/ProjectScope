@@ -11,7 +11,7 @@ $(function () {
             { data: 'id' },
             { data: 'name' },
             { data: 'email' },
-            { data: 'roles_assigned' },
+            { data: 'roles' },
             { data: 'created_at' },
             { data: 'actions' },
 
@@ -23,7 +23,8 @@ $(function () {
                 'targets': [3],
                 'orderable': true,
                 render: function(data, type, row){
-                   var assigned = '<div class="row">';
+
+                   var assigned = '<div>'
                     $.each(data, function(index, value){
                         assigned += '<div class="col-md-12" style="margin-bottom:5px; font-size:1rem;"><a href="roles/show/'+value.id+'" class="badge badge-dark">'+value.name+'</a></div>';
                     });
@@ -46,6 +47,7 @@ $(function () {
 
                 },
             },
+
 
 
 

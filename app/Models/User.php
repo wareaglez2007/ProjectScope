@@ -50,6 +50,6 @@ class User extends Authenticatable
      */
     public function roles()
     {
-        return $this->belongsToMany(Roles::class, 'roles_users', 'users_id')->orderby('id', 'ASC');
+        return $this->belongsToMany(Roles::class, 'roles_users', 'users_id');
     }
 }

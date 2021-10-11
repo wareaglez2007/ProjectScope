@@ -61,34 +61,38 @@ class UsersController extends Controller
             $totalRecords = User::select('count(*) as allcount')
                 ->count();
             $totalRecordswithFilter = User::select('count(*) as allcount')
-                ->where('name', 'like', '%' . $searchValue . '%')
+                ->whereHas('roles', function ($q) use ($searchValue) {
+                    $q->where('name', 'like', $searchValue . '%');
+                })
+                ->orwhere('name', 'like', '%' . $searchValue . '%')
                 ->orwhere('email', 'like', '%' . $searchValue . '%')
                 ->count();
-                // Fetch records
-            if($columnName == 'roles_assigned'){
-                $columnName = 'roles.name';
-                $records = User::join('roles_users', 'roles_users.users_id', '=', 'users.id')
-                ->join('roles', 'roles.id', '=', 'roles_users.roles_id')
-                ->skip($start)
-                ->take($rowperpage)
-                ->orderBy($columnName, $columnSortOrder)
-                ->where('roles.name', 'like', '%' . $searchValue . '%')
-                ->orwhere('users.name', 'like', '%' . $searchValue . '%')
-                ->orwhere('users.email', 'like', '%' . $searchValue . '%')
-                ->get(['users.*', 'roles.name as rolename', 'roles.id as roleid']);
-            }else{
-                $records = User::orderBy('users.'.$columnName, $columnSortOrder)
-                ->join('roles_users', 'roles_users.users_id', '=', 'users.id')
-                ->join('roles', 'roles.id', '=', 'roles_users.roles_id')
-                ->where('roles.name', 'like', '%' . $searchValue . '%')
-                ->orwhere('users.name', 'like', '%' . $searchValue . '%')
-                ->orwhere('users.email', 'like', '%' . $searchValue . '%')
-                ->skip($start)
-                ->take($rowperpage)
-                ->get(['users.*', 'roles.name as rolename', 'roles.id as roleid']);
-
+            // Fetch records
+            if ($columnName == 'roles') {
+                $columnName = "name";
+                $records = User::with(['roles' => function ($sortby) use ($columnName, $columnSortOrder) {
+                        $sortby->orderBy($columnName, $columnSortOrder);
+                    }])
+                    ->whereHas('roles', function ($q) use ($searchValue, $columnName, $columnSortOrder) {
+                        $q->where('name', 'like', $searchValue . '%')->orderBy('roles.' . $columnName, $columnSortOrder);
+                    })
+                    ->skip($start)
+                    ->take($rowperpage)
+                    ->orwhere('name', 'like', '%' . $searchValue . '%')
+                    ->orwhere('email', 'like', '%' . $searchValue . '%')
+                    ->get();
+            } else {
+                $records = User::orderBy($columnName, $columnSortOrder)
+                    ->with('roles')
+                    ->whereHas('roles', function ($q) use ($searchValue) {
+                        $q->where('name', 'like', $searchValue . '%');
+                    })
+                    ->orwhere('name', 'like', '%' . $searchValue . '%')
+                    ->orwhere('email', 'like', '%' . $searchValue . '%')
+                    ->skip($start)
+                    ->take($rowperpage)
+                    ->get();
             }
-
             $data_arr = array();
             $token = $request->session()->token();
 
@@ -97,9 +101,7 @@ class UsersController extends Controller
                 $name = $record->name;
                 $email = $record->email;
                 $created_at = date('m-d-Y @ H:i:s', strtotime($record->created_at));
-
-                $roles_assigned = User::find($id)->roles;
-
+                $roles = $record->roles;
                 $data_arr[] = array(
                     "id" => $id,
                     "name" => $name,
@@ -107,7 +109,7 @@ class UsersController extends Controller
                     "created_at" => $created_at,
                     "actions" => $id,
                     "token" => $token,
-                    "roles_assigned" => $roles_assigned
+                    "roles" => $roles
 
 
                 );
@@ -119,6 +121,7 @@ class UsersController extends Controller
                 "iTotalDisplayRecords" => $totalRecordswithFilter,
                 "aaData" => $data_arr
             );
+
             return response()->json($response);
         }
     }
