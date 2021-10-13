@@ -41,7 +41,6 @@ class UsersController extends Controller
     public function GetUsersData(Request $request)
     {
         if ($request->exists('draw')) {
-
             ## Read value
             $draw = $request->draw;
             $start = $request->start;
@@ -67,19 +66,22 @@ class UsersController extends Controller
                 ->orwhere('name', 'like', '%' . $searchValue . '%')
                 ->orwhere('email', 'like', '%' . $searchValue . '%')
                 ->count();
+
             // Fetch records
             if ($columnName == 'roles') {
-                $columnName = "name";
-                $records = User::with(['roles' => function ($sortby) use ($columnName, $columnSortOrder) {
-                        $sortby->orderBy($columnName, $columnSortOrder);
-                    }])
-                    ->whereHas('roles', function ($q) use ($searchValue, $columnName, $columnSortOrder) {
-                        $q->where('name', 'like', $searchValue . '%')->orderBy('roles.' . $columnName, $columnSortOrder);
-                    })
+                //Found some solution
+                //From: https://stackoverflow.com/questions/45849354/laravel-many-to-many-relationship-orderby
+                //Updated: 10-13-2021
+                $records = User::selectRaw('group_concat(roles.name order by roles.name ' . $columnSortOrder . ') as role_names, users.*')
+                    ->join('roles_users', 'users.id', '=', 'roles_users.users_id')
+                    ->join('roles', 'roles.id', '=', 'roles_users.roles_id')->whereHas('roles', function ($q) use ($searchValue) {
+                        $q->where('name', 'like', $searchValue . '%');
+                    })->orwhere('users.name', 'like', '%' . $searchValue . '%')
+                    ->orwhere('users.email', 'like', '%' . $searchValue . '%')
+                    ->groupBy('users_id')
+                    ->orderBy('role_names', $columnSortOrder)
                     ->skip($start)
                     ->take($rowperpage)
-                    ->orwhere('name', 'like', '%' . $searchValue . '%')
-                    ->orwhere('email', 'like', '%' . $searchValue . '%')
                     ->get();
             } else {
                 $records = User::orderBy($columnName, $columnSortOrder)
@@ -96,12 +98,16 @@ class UsersController extends Controller
             $data_arr = array();
             $token = $request->session()->token();
 
+            if ($columnName == "roles.name") {
+            }
+
+
             foreach ($records as $record) {
                 $id = $record->id;
                 $name = $record->name;
                 $email = $record->email;
                 $created_at = date('m-d-Y @ H:i:s', strtotime($record->created_at));
-                $roles = $record->roles;
+                $role_a = $record->roles;
                 $data_arr[] = array(
                     "id" => $id,
                     "name" => $name,
@@ -109,12 +115,9 @@ class UsersController extends Controller
                     "created_at" => $created_at,
                     "actions" => $id,
                     "token" => $token,
-                    "roles" => $roles
-
-
+                    "roles" => $role_a
                 );
             }
-
             $response = array(
                 "draw" => intval($draw),
                 "iTotalRecords" => $totalRecords,

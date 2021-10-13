@@ -54,4 +54,8 @@ class Roles extends Model
         return $this->belongsTo(Groups::class, 'groups_roles', 'roles_id')->orderby('id', 'ASC');
     }
 
+    public function users(){
+        return $this->belongsToMany(User::class, 'roles_users', 'roles_id', 'users_id')->orderBy('name');
+    }
+
 }

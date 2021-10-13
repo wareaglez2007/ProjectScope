@@ -50,6 +50,10 @@ class User extends Authenticatable
      */
     public function roles()
     {
-        return $this->belongsToMany(Roles::class, 'roles_users', 'users_id');
+        return $this->belongsToMany(Roles::class, 'roles_users', 'users_id')->orderby('roles.name', 'asc');
+    }
+
+    public function hasRoles(){
+        return $this->whereHas(Roles::class)->orderBy('roles.name', 'asc');
     }
 }

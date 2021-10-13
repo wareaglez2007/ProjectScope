@@ -26,7 +26,7 @@ $(function () {
 
                    var assigned = '<div>'
                     $.each(data, function(index, value){
-                        assigned += '<div class="col-md-12" style="margin-bottom:5px; font-size:1rem;"><a href="roles/show/'+value.id+'" class="badge badge-dark">'+value.name+'</a></div>';
+                        assigned += '<div class="col-md-12" style="margin-bottom:5px; font-size:1rem;"><a href="roles/show/'+value.id+'" class="badge badge-success">'+value.name+'</a></div>';
                     });
                     assigned +='</div>';
                     return assigned;
