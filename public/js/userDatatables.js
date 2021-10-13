@@ -22,13 +22,11 @@ $(function () {
             {
                 'targets': [3],
                 'orderable': true,
-                render: function(data, type, row){
-
-                   var assigned = '<div>'
-                    $.each(data, function(index, value){
-                        assigned += '<div class="col-md-12" style="margin-bottom:5px; font-size:1rem;"><a href="roles/show/'+value.id+'" class="badge badge-success">'+value.name+'</a></div>';
+                render: function (data, type, row) {
+                    var assigned = '';
+                    $.each(data, function (index, value) {
+                        assigned += '<a href="roles/show/' + value.id + '" class="btn btn-sm btn-warning" style="margin-top:2px; margin-right:2px;">' + value.name + '</a>';
                     });
-                    assigned +='</div>';
                     return assigned;
                 }
             },
@@ -43,23 +41,12 @@ $(function () {
                         + '<input type="submit" class="btn btn-danger btn-sm" value="Delete" /></form></div></div>';
                     return view_button;
 
-
-
                 },
             },
 
-
-
-
-
-
-
         ],
 
-
     });
-
-
 
 });
 
