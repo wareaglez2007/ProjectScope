@@ -75,7 +75,7 @@ class UsersController extends Controller
                 $records = User::selectRaw('group_concat(roles.name order by roles.name ' . $columnSortOrder . ') as role_names, users.*')
                     ->join('roles_users', 'users.id', '=', 'roles_users.users_id')
                     ->join('roles', 'roles.id', '=', 'roles_users.roles_id')->whereHas('roles', function ($q) use ($searchValue) {
-                        $q->where('name', 'like', $searchValue . '%');
+                        $q->where('roles.name', 'like', '%' . $searchValue . '%');
                     })->orwhere('users.name', 'like', '%' . $searchValue . '%')
                     ->orwhere('users.email', 'like', '%' . $searchValue . '%')
                     ->groupBy('users_id')
@@ -87,7 +87,7 @@ class UsersController extends Controller
                 $records = User::orderBy($columnName, $columnSortOrder)
                     ->with('roles')
                     ->whereHas('roles', function ($q) use ($searchValue) {
-                        $q->where('name', 'like', $searchValue . '%');
+                        $q->where('roles.name', 'like', '%' . $searchValue . '%');
                     })
                     ->orwhere('name', 'like', '%' . $searchValue . '%')
                     ->orwhere('email', 'like', '%' . $searchValue . '%')

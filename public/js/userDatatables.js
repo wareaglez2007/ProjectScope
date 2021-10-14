@@ -45,6 +45,9 @@ $(function () {
             },
 
         ],
+        language: {
+            searchPlaceholder: "Search name, email or role name"
+        }
 
     });
 
