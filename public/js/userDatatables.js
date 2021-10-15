@@ -50,6 +50,7 @@ $(function () {
         }
 
     });
+ $('#users_table_filter input').attr('class', 'form-control');
 
 });
 

@@ -58,10 +58,12 @@ class UsersController extends Controller
 
             // Total records
             $totalRecords = User::select('count(*) as allcount')
+                ->with('roles')
                 ->count();
             $totalRecordswithFilter = User::select('count(*) as allcount')
+                ->with('roles')
                 ->whereHas('roles', function ($q) use ($searchValue) {
-                    $q->where('name', 'like', $searchValue . '%');
+                    $q->where('name', 'like', '%' . $searchValue . '%');
                 })
                 ->orwhere('name', 'like', '%' . $searchValue . '%')
                 ->orwhere('email', 'like', '%' . $searchValue . '%')
@@ -87,10 +89,10 @@ class UsersController extends Controller
                 $records = User::orderBy($columnName, $columnSortOrder)
                     ->with('roles')
                     ->whereHas('roles', function ($q) use ($searchValue) {
-                        $q->where('roles.name', 'like', '%' . $searchValue . '%');
+                        $q->where('name', 'like', '%' . $searchValue . '%');
                     })
-                    ->orwhere('name', 'like', '%' . $searchValue . '%')
-                    ->orwhere('email', 'like', '%' . $searchValue . '%')
+                    ->orwhere('users.name', 'like', '%' . $searchValue . '%')
+                    ->orwhere('users.email', 'like', '%' . $searchValue . '%')
                     ->skip($start)
                     ->take($rowperpage)
                     ->get();
@@ -98,8 +100,6 @@ class UsersController extends Controller
             $data_arr = array();
             $token = $request->session()->token();
 
-            if ($columnName == "roles.name") {
-            }
 
 
             foreach ($records as $record) {
