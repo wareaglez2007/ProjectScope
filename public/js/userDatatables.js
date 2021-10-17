@@ -23,9 +23,11 @@ $(function () {
                 'targets': [3],
                 'orderable': true,
                 render: function (data, type, row) {
+                    var role_name = data.split(',');
                     var assigned = '';
-                    $.each(data, function (index, value) {
-                        assigned += '<a href="roles/show/' + value.id + '" class="btn btn-sm btn-warning" style="margin-top:2px; margin-right:2px;">' + value.name + '</a>';
+                    $.each(role_name, function (index, value) {
+                        var role = value.split('=');
+                        assigned += '<a href="roles/show/' + role[1] + '" class="btn btn-outline-dark btn-sm" style="margin-top:2px; margin-right:2px;">' + role[0] + '</a>';
                     });
                     return assigned;
                 }
@@ -50,7 +52,7 @@ $(function () {
         }
 
     });
- $('#users_table_filter input').attr('class', 'form-control');
+    $('#users_table_filter input').attr('class', 'form-control');
 
 });
 

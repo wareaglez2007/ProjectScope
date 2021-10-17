@@ -27,7 +27,7 @@ class CreatePermissionsTable extends Migration
         Schema::create('permissions', function (Blueprint $table) {
             $table->id();
             $table->string('access_type')->uniqid();
-            $table->string('access_rights')->unique();
+            $table->bigInteger('access_rights')->unique();
             $table->string('created_by')->default('PermissionsSeeder');
             $table->timestamps();
         });

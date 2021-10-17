@@ -16,6 +16,7 @@ use Illuminate\Foundation\Auth\RegistersUsers;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\DB;
 
 class UsersController extends Controller
 {
@@ -71,43 +72,28 @@ class UsersController extends Controller
 
             // Fetch records
             if ($columnName == 'roles') {
-                //Found some solution
-                //From: https://stackoverflow.com/questions/45849354/laravel-many-to-many-relationship-orderby
-                //Updated: 10-13-2021
-                $records = User::selectRaw('group_concat(roles.name order by roles.name ' . $columnSortOrder . ') as role_names, users.*')
-                    ->join('roles_users', 'users.id', '=', 'roles_users.users_id')
-                    ->join('roles', 'roles.id', '=', 'roles_users.roles_id')->whereHas('roles', function ($q) use ($searchValue) {
-                        $q->where('roles.name', 'like', '%' . $searchValue . '%');
-                    })->orwhere('users.name', 'like', '%' . $searchValue . '%')
-                    ->orwhere('users.email', 'like', '%' . $searchValue . '%')
-                    ->groupBy('users_id')
-                    ->orderBy('role_names', $columnSortOrder)
-                    ->skip($start)
-                    ->take($rowperpage)
-                    ->get();
-            } else {
-                $records = User::orderBy($columnName, $columnSortOrder)
-                    ->with('roles')
-                    ->whereHas('roles', function ($q) use ($searchValue) {
-                        $q->where('name', 'like', '%' . $searchValue . '%');
-                    })
-                    ->orwhere('users.name', 'like', '%' . $searchValue . '%')
-                    ->orwhere('users.email', 'like', '%' . $searchValue . '%')
-                    ->skip($start)
-                    ->take($rowperpage)
-                    ->get();
+                $columnName = 'role_name';
             }
+            $records = DB::table('roles')->selectRaw('group_concat(roles.name,"=",roles.id) as role_name,  users.*')
+                ->join('roles_users', 'roles.id', '=', 'roles_users.roles_id')
+                ->join('users', 'roles_users.users_id', '=', 'users.id')
+                ->where('roles.name', 'like', '%' . $searchValue . '%')
+                ->orwhere('users.name', 'like', '%' . $searchValue . '%')
+                ->orwhere('users.email', 'like', '%' . $searchValue . '%')
+                ->groupBy('users.id')
+                ->orderBy($columnName, $columnSortOrder)
+                ->skip($start)
+                ->take($rowperpage)
+                ->get();
+          //  dd($records);
             $data_arr = array();
             $token = $request->session()->token();
-
-
-
             foreach ($records as $record) {
                 $id = $record->id;
                 $name = $record->name;
                 $email = $record->email;
                 $created_at = date('m-d-Y @ H:i:s', strtotime($record->created_at));
-                $role_a = $record->roles;
+                $role_a = $record->role_name;
                 $data_arr[] = array(
                     "id" => $id,
                     "name" => $name,
@@ -384,7 +370,7 @@ class UsersController extends Controller
             $rolechecker = new RolesUser();
             $is_admin = $rolechecker->where('users_id', $id)->get();
             foreach ($is_admin as $ad) {
-                if ($ad->roles_id == 1) {
+                if ($ad->roles_id == 1 || $user->email == 'wareaglez2007@hotmail.com') {
                     $code = 401;
                     $response_messages['error'] = "Error: Cannot delete " . $user->name . ". Please try another user. ";
                 } else {

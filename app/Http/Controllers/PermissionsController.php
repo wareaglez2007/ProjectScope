@@ -50,11 +50,13 @@ class PermissionsController extends Controller
                 ->count();
             $totalRecordswithFilter = Permissions::select('count(*) as allcount')
                 ->where('access_type', 'like', '%' . $searchValue . '%')
+                ->orwhere('access_rights', 'like', '%' . $searchValue . '%')
                 ->count();
 
             // Fetch records
             $records = Permissions::orderBy($columnName, $columnSortOrder)
                 ->where('access_type', 'like', '%' . $searchValue . '%')
+                ->orwhere('access_rights', 'like', '%' . $searchValue . '%')
                 ->skip($start)
                 ->take($rowperpage)
                 ->get();
