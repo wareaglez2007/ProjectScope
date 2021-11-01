@@ -3,7 +3,7 @@
         <tr>
             <th>Id</th>
             <th>Group Name</th>
-            <th>Roles Count</th>
+            <th>Roles</th>
             <th>Updated At</th>
             <th>Actions</th>
         </tr>

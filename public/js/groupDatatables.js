@@ -1,5 +1,5 @@
 $(function () {
-  /** Bootstrap popover 09-08-2021 */
+    /** Bootstrap popover 09-08-2021 */
 
     $('#groups_table').DataTable({
         processing: true,
@@ -11,7 +11,7 @@ $(function () {
         columns: [
             { data: 'id' },
             { data: 'name' },
-            { data: 'roles_count' },
+            { data: 'rolename' },
             { data: 'updated_at' },
             { data: 'actions' },
 
@@ -34,17 +34,27 @@ $(function () {
                 },
                 {
                     targets: [2], //Roles count
-                    orderable: false,
-
+                    orderable: true,
+                    render: function (data, type, row) {
+                        var assigned = '';
+                        if (data == "") {
+                            assigned += '<i class="bi bi-exclamation-square-fill text-danger"></i>&nbsp;<i class="text-danger">No roles are assigned to this group!</i>';
+                        } else {
+                            $.each(data, function (index, value) {
+                                assigned += '<a href="roles/show/' + value.id + '" class="btn btn-outline-dark btn-sm" style="margin-top:2px; margin-right:2px;">' + value.name + '</a>';
+                            });
+                        }
+                        return assigned;
+                    },
                 },
                 {
                     targets: [1],
-                    render: function(data, type, row){
+                    render: function (data, type, row) {
 
-                        if(row.roles_count == 0){
-                            var attention = row.name+' &nbsp;<i class="bi bi-exclamation-circle-fill text-warning" data-toggle="tooltip" data-placement="right" title="Attention! No roles have been assigned to this group!"></i>';
+                        if (row.roles_count == 0) {
+                            var attention = row.name + ' &nbsp;<i class="bi bi-exclamation-circle-fill text-warning" data-toggle="tooltip" data-placement="right" title="Attention! No roles have been assigned to this group!"></i>';
                             return attention;
-                        }else{
+                        } else {
                             return row.name;
                         }
 
@@ -112,7 +122,7 @@ function confirm(id) {
 
                         }, 1000);
 
-                    }else{
+                    } else {
                         HandleAjaxResponsesToast(2200, toastcolor, uid, toast_message, 200);
                         setTimeout(() => {
                             $('#confirmdestroygroup').modal('hide');

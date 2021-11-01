@@ -20,7 +20,7 @@
 
                         <tbody>
                             <tr>
-                                <td scope="row"><a href="" class="btn btn-success btn-sm">Create New Role</a></td>
+                                <td scope="row"><a href="{{ route('admin.roles.create') }}" class="btn btn-success btn-sm">Create New Role</a></td>
                                 <td><a href="{{ route('admin.roles') }}" class="btn btn-primary btn-sm">See All Roles</a></td>
                             </tr>
                         </tbody>

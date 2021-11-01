@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use PHPUnit\TextUI\XmlConfiguration\Group;
 use Symfony\Component\ErrorHandler\ErrorHandler;
+use Illuminate\Support\Facades\DB;
 
 class GroupsController extends Controller
 {
@@ -71,31 +72,66 @@ class GroupsController extends Controller
 
             // Total records
             $totalRecords = Groups::select('count(*) as allcount')
+                ->with('groles')
                 ->count();
             $totalRecordswithFilter = Groups::select('count(*) as allcount')
-                ->where('name', 'like', '%' . $searchValue . '%')
+                ->whereHas('groles', function ($q) use ($searchValue) {
+                    $q->where('name', 'like', '%' . $searchValue . '%');
+                })
+                ->orwhere('name', 'like', '%' . $searchValue . '%')
                 ->count();
 
             // Fetch records
-            $records = Groups::orderBy($columnName, $columnSortOrder)
-                ->where('name', 'like', '%' . $searchValue . '%')
-                ->skip($start)
-                ->take($rowperpage)
-                ->get();
+            if ($columnName == "rolename") {
+                if ($columnSortOrder == 'asc') {
+                    $records = Groups::whereHas('groles', function ($q) use ($searchValue) {
+                        $q->where('name', 'like', '%' . $searchValue . '%');
+                    })->orwhere('name', 'like', '%' . $searchValue . '%')
+                        ->get()
+                        ->sortBy(function ($group, $key) use ($start, $rowperpage) {
+                            foreach ($group['groles'] as $gro) {
+                                return $gro->name;
+                            }
+                        })
+                        ->skip($start)
+                        ->take($rowperpage);
+                } else {
+                    $records = Groups::whereHas('groles', function ($q) use ($searchValue) {
+                        $q->where('name', 'like', '%' . $searchValue . '%');
+                    })->orwhere('name', 'like', '%' . $searchValue . '%')
+                        ->get()
+                        ->sortByDesc(function ($group, $key) use ($start, $rowperpage) {
+                            foreach ($group['groles']->skip($start)->take($rowperpage) as $gro) {
+                                return $gro->name;
+                            }
+                        })
+                        ->skip($start)
+                        ->take($rowperpage);
+                }
+                $records->values()->all();
+            } else {
+                $records = Groups::orderBy($columnName, $columnSortOrder)
+                    ->whereHas('groles', function ($q) use ($searchValue) {
+                        $q->where('name', 'like', '%' . $searchValue . '%');
+                    })
+                    ->orwhere('name', 'like', '%' . $searchValue . '%')
+                    ->skip($start)
+                    ->take($rowperpage)
+                    ->get();
+            }
 
             $data_arr = array();
             $token = $request->session()->token();
             foreach ($records as $record) {
                 $id = $record->id;
                 $name = $record->name;
-                $roles_count = $record->groles->count();
-                // dd($roles_count);
+                $roles_count = $record->groles;
                 $updated_at = date('m-d-Y @ H:i:s', strtotime($record->updated_at));
 
                 $data_arr[] = array(
                     "id" => $id,
                     "name" => $name,
-                    "roles_count" => $roles_count,
+                    "rolename" => $roles_count,
                     "updated_at" => $updated_at,
                     "actions" => $id,
                     "token" => $token
@@ -168,7 +204,7 @@ class GroupsController extends Controller
      */
     public function show($id)
     {
-         //Will need the group onfo
+        //Will need the group onfo
         //will need the roles assigned to group
         //will need the list of roles
         $group = Groups::find($id);
@@ -361,10 +397,10 @@ class GroupsController extends Controller
         if (isset($request->id)) {
             //check group
             $group = Groups::find($id);
-            if(strtolower(trim($group->name)) == "admin" || strtolower(trim($group->name)) == "users"){
-                    $code = 403;
-                    $response_messages['error'] = "Error: Cannot delete " . $group->name . ". Please try another group. ";
-            }else{
+            if (strtolower(trim($group->name)) == "admin" || strtolower(trim($group->name)) == "users") {
+                $code = 403;
+                $response_messages['error'] = "Error: Cannot delete " . $group->name . ". Please try another group. ";
+            } else {
 
                 $del = new Groups();
                 $do_del = $del->where('id', $request->id)->forceDelete();
