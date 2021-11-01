@@ -36,11 +36,10 @@ $(function () {
                 'targets': [5], /* column index  actions column*/
                 'orderable': false, /* true or false */
                 "render": function (data, type, row) {
-                    var view_button = '<div style="text-align:center"><div class="btn-group"> <a href="users/' + row.id + '/show" class="btn btn-info btn-sm">View</a>';
+                    var view_button = '<form method="post" onsubmit="event.preventDefault();confirm(' + row.id + ');"><div style="text-align:center"><div class="btn-group"> <a href="users/' + row.id + '/show" class="btn btn-info btn-sm">View</a>';
                     view_button += ' <a href="users/' + row.id + '/edit" class="btn btn-secondary btn-sm">Edit</a>';
-                    view_button += '<form method="post" onsubmit="event.preventDefault();confirm(' + row.id + ');">'
-                        + '<input type="hidden" name="uid" value="' + row.id + '"/><input type="hidden" name="_token" value="' + row.token + '"/>'
-                        + '<input type="submit" class="btn btn-danger btn-sm" value="Delete" /></form></div></div>';
+                    view_button += '<input type="hidden" name="uid" value="' + row.id + '"/><input type="hidden" name="_token" value="' + row.token + '"/>'
+                        + '<input type="submit" class="btn btn-danger btn-sm" value="Delete" /></div></div></form>';
                     return view_button;
 
                 },
