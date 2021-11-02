@@ -93,4 +93,19 @@ Route::middleware('auth')->prefix('admin')->group(function () {
 
 Route::middleware('auth')->prefix('users')->group(function () {
     Route::get('profile', [App\Http\Controllers\ProfileController::class, 'index'])->name('user.profile');
+
+
+    /**
+     * Tickets (general users)
+     */
+    Route::get('tickets', [App\Http\Controllers\TicketsController::class, 'index'])->name('user.tickets');
+    // Route::get('/getusers', [App\Http\Controllers\UsersController::class, 'GetUsersData'])->name('admin.users.getusers');
+    // Route::get('users/create', [App\Http\Controllers\UsersController::class, 'create'])->name('admin.users.create');
+    // Route::get('users/{id}/show', [App\Http\Controllers\UsersController::class, 'show'])->name('admin.users.show');
+    // Route::get('users/{id}/edit', [App\Http\Controllers\UsersController::class, 'edit'])->name('admin.users.edit');
+    // Route::get('users/store', [App\Http\Controllers\UsersController::class, 'store'])->name('admin.users.store');
+    // Route::post('users/{id}/update', [App\Http\Controllers\UsersController::class, 'update'])->name('admin.users.update');
+    // Route::post('users/{id}/destroy', [App\Http\Controllers\UsersController::class, 'destroy'])->name('admin.users.destroy');
+
+
 });
