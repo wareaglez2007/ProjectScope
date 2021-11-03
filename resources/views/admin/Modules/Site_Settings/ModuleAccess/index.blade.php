@@ -7,22 +7,38 @@
 
             <div class="card-body">
                 {{-- -ROW 1 --}}
+                {{-- -ROW 1 --}}
                 <div class="row">
-                    {{-- Manage Modules --}}
-                    <div class="col-md-6">
-                        <div class="card">
+                    <div class="col-md-12">
+                        {{-- Modules options --}}
+                        <div class="card" style="margin-bottom: 15px;">
                             <div class="card-body">
-                                <h6 class="card-title">Module Access Management</h6>
-                            </div>
-                            <ul class="list-group list-group-flush">
-                                <li class="list-group-item"><a href="">Create new relation</a></li>
-                                <li class="list-group-item"><a href="">Edit existing module relation</a></li>
-                                <li class="list-group-item"><a href="">Delete module permission</a></li>
-                            </ul>
-                        </div>
 
+                                <div class="btn-toolbar" role="toolbar" aria-label="">
+                                    <div class="btn-group" role="group" aria-label="">
+                                        <a href="{{ route('admin.groups') }}" class="btn btn-light">
+                                            <i class="bi bi-layers-fill"></i>
+                                            View all Modules</a>
+                                        <button type="button" class="btn btn-light">
+                                            <i class="bi bi-box-arrow-in-up-right"></i>
+                                            Export Data</button>
+                                        <button type="button" class="btn btn-light">
+                                            <i class="bi bi-box-arrow-in-down-left"></i>
+                                            Import Data</button>
+                                        <button type="button" class="btn btn-light"><i class="bi bi-pie-chart-fill"></i>
+                                            Stats</button>
+                                        <button type="button" class="btn btn-light"><i class="bi bi-arrow-clockwise"></i>
+                                            Refresh</button>
+                                    </div>
+
+                                </div>
+
+                            </div>
+                        </div>
                     </div>
+
                 </div>
+
 
             </div>
         </div>

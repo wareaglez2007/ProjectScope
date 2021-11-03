@@ -13,17 +13,37 @@
             <div class="card-body">
                 {{-- -ROW 1 --}}
                 <div class="row">
-                    {{-- Manage Roles --}}
-                    <table class="table">
+                    <div class="col-md-12">
+                        {{-- user options --}}
+                        <div class="card" style="margin-bottom: 15px;">
+                            <div class="card-body">
 
-                        <tbody>
-                            <tr>
-                                <td scope="row"><a href="{{ route('admin.users.create') }}"
-                                        class="btn btn-success btn-sm">Create New User</a></td>
-                                <td><a href="{{ route('admin.users') }}" class="btn btn-info btn-sm">See All Users</a></td>
-                            </tr>
-                        </tbody>
-                    </table>
+                                <div class="btn-toolbar" role="toolbar" aria-label="">
+                                    <div class="btn-group" role="group" aria-label="">
+                                        <a href="{{ route('admin.users.create') }}" class="btn btn-light">
+                                            <i class="bi bi-person-plus-fill"></i>
+                                            Create New User</a>
+                                        <a href="{{ route('admin.users') }}" class="btn btn-light">
+                                            <i class="bi bi-person-lines-fill"></i>
+                                            View all Users</a>
+                                        <button type="button" class="btn btn-light">
+                                            <i class="bi bi-box-arrow-in-up-right"></i>
+                                            Export Data</button>
+                                        <button type="button" class="btn btn-light">
+                                            <i class="bi bi-box-arrow-in-down-left"></i>
+                                            Import Data</button>
+                                        <button type="button" class="btn btn-light"><i class="bi bi-pie-chart-fill"></i>
+                                            Stats</button>
+                                        <button type="button" class="btn btn-light"><i class="bi bi-arrow-clockwise"></i>
+                                            Refresh</button>
+                                    </div>
+
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+
                 </div>
 
                 {{-- Main Section to display content for this module --}}
