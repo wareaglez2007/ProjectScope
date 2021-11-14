@@ -5,7 +5,11 @@ $(function () {
         serverSide: true,
         ajax: {
             url: '/admin/users/getusers',
-
+            data: function (data) {
+                var role = $('#role_cat').val();
+                // Append to data
+                data.searchByRole = role;
+            }
         },
         columns: [
             { data: 'id' },
@@ -51,6 +55,8 @@ $(function () {
         }
 
     });
+
+
     $('#users_table_filter input').attr('class', 'form-control');
 
 });
@@ -121,4 +127,12 @@ function confirm(id) {
     });
 
 }
+
+
+    //
+    function filtercat(v) {
+        $('#role_cat').val(v);
+        var datatable = $('#users_table').DataTable();
+        datatable.draw();
+    }
 

@@ -26,7 +26,7 @@ $(function () {
         processing: true,
         serverSide: false,
         paging: false,
-       // "ajax": '/admin/users/getusers',
+        // "ajax": '/admin/users/getusers',
         // columns: [
         //     { data: 'id' },
         //     { data: 'name' },

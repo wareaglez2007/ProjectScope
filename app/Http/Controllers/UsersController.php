@@ -32,15 +32,19 @@ class UsersController extends Controller
     public function index(Request $request)
     {
         $routes = Route::getRoutes();
+        $filters = Roles::withCount('users')->get();
 
+        //dd($filters);
         return view('admin.Modules.Site_Settings.UserManagement.index')->with([
             'modname' => 'Users Management',
             'user_view' => 'index',
             'current_page' => 1,
+            'cats' => $filters
         ]);
     }
     public function GetUsersData(Request $request)
     {
+        //dd($request);
         if ($request->exists('draw')) {
             ## Read value
             $draw = $request->draw;
@@ -55,37 +59,52 @@ class UsersController extends Controller
             $columnIndex = $columnIndex_arr[0]['column']; // Column index
             $columnName = $columnName_arr[$columnIndex]['data']; // Column name
             $columnSortOrder = $order_arr[0]['dir']; // asc or desc
-            $searchValue = $search_arr['value']; // Search value
+            $searchValue = '%' . $search_arr['value']. '%'; // Search value
 
+           // dd($request->search);
+            if ($request->exists('searchByRole') && $request->searchByRole != null && $search_arr['value'] == null ) {
+                $operator = '=';
+                $searchValue =  $request->searchByRole;
+            } else {
+                $operator = 'like';
+                $searchValue = '%' . $search_arr['value']. '%';
+            }
+           // dd($operator);
             // Total records
             $totalRecords = User::select('count(*) as allcount')
                 ->with('roles')
                 ->count();
             $totalRecordswithFilter = User::select('count(*) as allcount')
                 ->with('roles')
-                ->whereHas('roles', function ($q) use ($searchValue) {
-                    $q->where('name', 'like', '%' . $searchValue . '%');
+                ->whereHas('roles', function ($q) use ($operator, $searchValue) {
+                    $q->where('name', $operator, $searchValue);
                 })
-                ->orwhere('name', 'like', '%' . $searchValue . '%')
-                ->orwhere('email', 'like', '%' . $searchValue . '%')
+                ->orwhere('name', $operator, $searchValue)
+                ->orwhere('email',  $operator, $searchValue)
+                ->orwhere('id',  $operator, $searchValue)
                 ->count();
 
             // Fetch records
             if ($columnName == 'roles') {
                 $columnName = 'role_name';
             }
+
             $records = DB::table('roles')->selectRaw('group_concat(roles.name,"=",roles.id) as role_name,  users.*')
-                ->join('roles_users', 'roles.id', '=', 'roles_users.roles_id')
-                ->join('users', 'roles_users.users_id', '=', 'users.id')
-                ->where('roles.name', 'like', '%' . $searchValue . '%')
-                ->orwhere('users.name', 'like', '%' . $searchValue . '%')
-                ->orwhere('users.email', 'like', '%' . $searchValue . '%')
+                ->join('roles_users', 'roles.id', 'roles_users.roles_id')
+                ->join('users', 'roles_users.users_id', 'users.id')
+                ->where(function($q) use ($operator, $searchValue) {
+                    $q->where('roles.name', $operator, $searchValue);
+
+                })
+                ->orwhere('users.name', $operator, $searchValue)
+                ->orwhere('users.email', $operator, $searchValue)
+                ->orwhere('users.id',  $operator, $searchValue)
                 ->groupBy('users.id')
                 ->orderBy($columnName, $columnSortOrder)
                 ->skip($start)
                 ->take($rowperpage)
                 ->get();
-          //  dd($records);
+            // dd($records);
             $data_arr = array();
             $token = $request->session()->token();
             foreach ($records as $record) {
