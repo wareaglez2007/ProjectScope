@@ -129,6 +129,7 @@ class RolesController extends Controller
      */
     public function store(Request $request)
     {
+        dd($request);
         if ($request->exists('flag')) {
             switch ($request->flag) {
                 case 'add_roles_modules_access':
